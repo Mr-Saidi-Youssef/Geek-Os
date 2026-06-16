@@ -1,0 +1,26 @@
+{
+  "name": "anime-notion-mal-sync",
+  "version": "1.0.0",
+  "description": "Automated sync from MyAnimeList to Notion databases utilizing Jikan API v4 and Notion SDK",
+  "main": "sync.js",
+  "scripts": {
+    "start": "node widget_server.js"
+  },
+  "keywords": [
+    "notion",
+    "myanimelist",
+    "jikan",
+    "anime",
+    "sync",
+    "automation"
+  ],
+  "author": "Byronotion",
+  "license": "MIT",
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "@supabase/supabase-js": "^2.107.0",
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1"
+  }
+}

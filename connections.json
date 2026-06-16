@@ -1,0 +1,17 @@
+{
+  "d5cf3593-912b-43fe-9952-4f774fc2f620": {
+    "accessToken": "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",
+    "workspaceName": "Notion de Youssef Saidi",
+    "workspaceId": "d5cf3593-912b-43fe-9952-4f774fc2f620",
+    "updatedAt": "2026-06-04T08:39:54.699Z",
+    "databaseMappings": {
+      "movie": "7ab34024-5e7e-4b22-a368-5608e103c0aa",
+      "tv": "36dd0aaf-19d0-8123-893f-cbaf9bff624a",
+      "book": "8b2780bf-d844-42d8-bcd9-5223152c0ece",
+      "anime": "36dd0aaf-19d0-8007-92e7-dca0434c570c",
+      "manga": "370d0aaf-19d0-8121-a36f-f3dfcc914532",
+      "game": "36fd0aaf-19d0-815b-b5d3-d51ed587a7d1",
+      "comic": "371d0aaf-19d0-81c5-9b14-fbc0c52b0040"
+    }
+  }
+}

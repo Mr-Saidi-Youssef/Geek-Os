@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup - Notion Media Widget</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Custom styles for Setup interface */
+    .setup-container {
+      max-width: 650px;
+    }
+    .setup-section {
+      background: rgba(20, 23, 36, 0.3);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .setup-section h2 {
+      font-family: var(--font-header);
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mapping-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media (min-width: 480px) {
+      .mapping-grid {
+        grid-template-columns: 140px 1fr;
+        align-items: center;
+      }
+    }
+    .mapping-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mapping-select {
+      width: 100%;
+      background: rgba(10, 11, 18, 0.8);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-family: var(--font-family);
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .mapping-select:focus {
+      border-color: var(--primary-glow);
+    }
+    .embed-url-box {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .embed-url-input {
+      flex-grow: 1;
+      background: rgba(10, 11, 18, 0.8);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-family: var(--font-family);
+      font-size: 0.85rem;
+      outline: none;
+      read-only: true;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .save-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary-glow), #7743df);
+      border: none;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-family: var(--font-family);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(144, 94, 255, 0.25);
+    }
+    .save-btn:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 4px 20px rgba(144, 94, 255, 0.4);
+    }
+    .status-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(16, 185, 129, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
+    }
+    .status-toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .instruction-step {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .instruction-step strong {
+      color: var(--text-main);
+    }
+    .error-box {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-container">
+    <div class="glow-ball glow-purple"></div>
+    <div class="glow-ball glow-blue"></div>
+  </div>
+
+  <div class="widget-container setup-container">
+    <header class="widget-header">
+      <div class="logo-area">
+        <span class="logo-icon">⚙️</span>
+        <div class="logo-text">
+          <h1>Widget Configuration</h1>
+          <p>Link your Notion databases to the media categories</p>
+        </div>
+      </div>
+    </header>
+
+    <div id="error-message" class="error-box"></div>
+
+    <div id="setup-content">
+      <!-- Section 0: Auto Mapping Success View (Hidden by default) -->
+      <div id="auto-success-view" style="display: none;" class="setup-section">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <span style="font-size: 2.5rem; display: block; margin-bottom: 8px;">🎉</span>
+          <h2 style="font-family: var(--font-header); font-size: 1.25rem; color: #ffffff; margin-bottom: 8px; justify-content: center; display: flex; align-items: center; gap: 8px;">Workspace Connected!</h2>
+          <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; max-width: 420px; margin: 0 auto;">
+            We automatically detected and configured your Watchlist Tracker databases. No manual mapping is required.
+          </p>
+        </div>
+
+        <div id="detected-mappings-list" style="display: flex; flex-direction: column; gap: 8px; background: rgba(0, 0, 0, 0.25); padding: 14px; border-radius: 12px; border: 1px solid var(--border-light); margin-bottom: 20px;">
+          <!-- Filled dynamically -->
+        </div>
+
+        <div style="text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+          <div id="countdown-text" style="font-size: 0.8rem; color: #a78bfa; font-weight: 600; text-shadow: 0 0 10px rgba(167, 139, 250, 0.3);">
+            Ready to track! Closing window in 3 seconds...
+          </div>
+          <div style="display: flex; gap: 10px; width: 100%;">
+            <button id="confirm-close-btn" class="save-btn" style="flex: 1; margin: 0; padding: 10px 16px; font-size: 0.85rem;">
+              🚀 Close Now
+            </button>
+            <button id="edit-mappings-btn" class="btn-secondary" style="padding: 10px 16px; font-size: 0.85rem;">
+              ⚙️ Edit Mappings
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 1: Database Mapping -->
+      <section id="mapping-form-section" class="setup-section">
+        <h2>📂 Database Mappings</h2>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
+          Select the database from your workspace that corresponds to each media category.
+        </p>
+        
+        <form id="mapping-form" class="mapping-grid">
+          <div class="mapping-label">🎬 Movies</div>
+          <select id="map-movie" class="mapping-select">
+            <option value="">-- Select Movie Database --</option>
+          </select>
+
+          <div class="mapping-label">📺 TV Shows</div>
+          <select id="map-tv" class="mapping-select">
+            <option value="">-- Select TV Show Database --</option>
+          </select>
+
+          <div class="mapping-label">📚 Books</div>
+          <select id="map-book" class="mapping-select">
+            <option value="">-- Select Book Database --</option>
+          </select>
+
+          <div class="mapping-label">🌸 Anime</div>
+          <select id="map-anime" class="mapping-select">
+            <option value="">-- Select Anime Database --</option>
+          </select>
+
+          <div class="mapping-label">📖 Manga</div>
+          <select id="map-manga" class="mapping-select">
+            <option value="">-- Select Manga Database --</option>
+          </select>
+
+          <div class="mapping-label">🎮 Games</div>
+          <select id="map-game" class="mapping-select">
+            <option value="">-- Select Game Database --</option>
+          </select>
+
+          <div class="mapping-label">🦸 Comics</div>
+          <select id="map-comic" class="mapping-select">
+            <option value="">-- Select Comic Database --</option>
+          </select>
+        </form>
+      </section>
+
+      <!-- Section 2: Embed Instructions -->
+      <section id="embed-section" class="setup-section">
+        <h2>🔗 Embed inside Notion</h2>
+        <div class="instruction-step">
+          1. Copy your unique widget embed URL below:
+        </div>
+        <div class="embed-url-box">
+          <input type="text" id="embed-url" class="embed-url-input" readonly value="Loading URL...">
+          <button id="copy-btn" class="btn-secondary">Copy</button>
+        </div>
+        <div id="embed-warning" style="display:none; margin-top:12px; font-size:0.75rem; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3); color:#fcd34d; padding:10px; border-radius:8px; line-height:1.4;">
+          ⚠️ <strong>Notion Embeds require HTTPS:</strong> Notion cannot load insecure <code>http://</code> links inside embeds. Please replace the domain with your secure public domain (e.g. <code>https://wet-animals-visit.loca.lt</code>) when pasting the link.
+        </div>
+        <div class="instruction-step" style="margin-top: 12px;">
+          2. Inside Notion, go to your dashboard, type <strong>/embed</strong>, and paste the URL.
+        </div>
+      </section>
+
+      <button id="save-button" class="save-btn">
+        💾 Save Configuration
+      </button>
+    </div>
+  </div>
+
+  <div id="toast" class="status-toast">
+    ✓ Mappings saved successfully!
+  </div>
+
+  <script>
+    // Setup script
+    const urlParams = new URLSearchParams(window.location.search);
+    const workspaceId = urlParams.get('workspace_id');
+
+    if (!workspaceId) {
+      showError("Workspace ID is missing. Please authorize via the link on the home page.");
+      document.getElementById('setup-content').style.display = 'none';
+    } else {
+      initSetup();
+    }
+
+    function showError(msg) {
+      const errBox = document.getElementById('error-message');
+      errBox.textContent = msg;
+      errBox.style.display = 'block';
+    }
+
+    let countdownInterval = null;
+
+    function showAutoSuccessView(mappings, databases) {
+      const categoryLabels = {
+        movie: '🎬 Movies Database',
+        tv: '📺 TV Shows Database',
+        book: '📚 Books Database',
+        anime: '🌸 Anime Database',
+        manga: '📖 Manga Database',
+        game: '🎮 Games Database',
+        comic: '🦸 Comics Database'
+      };
+
+      const listContainer = document.getElementById('detected-mappings-list');
+      listContainer.innerHTML = '';
+
+      Object.entries(mappings).forEach(([type, dbId]) => {
+        const matchedDb = databases.find(db => db.id === dbId);
+        const dbTitle = matchedDb ? matchedDb.title : 'Linked';
+
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        row.style.padding = '8px 0';
+        row.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
+        row.innerHTML = `
+          <span style="font-weight: 600; color: #ffffff; font-size: 0.8rem;">${categoryLabels[type]}</span>
+          <span style="color: #a78bfa; font-size: 0.8rem; font-weight: 500; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px;">${dbTitle}</span>
+        `;
+        listContainer.appendChild(row);
+      });
+
+      // Show auto success view, hide manual configuration sections
+      document.getElementById('auto-success-view').style.display = 'block';
+      document.getElementById('mapping-form-section').style.display = 'none';
+      const embedSection = document.getElementById('embed-section');
+      if (embedSection) embedSection.style.display = 'none';
+      document.getElementById('save-button').style.display = 'none';
+
+      // Start countdown
+      let countdown = 3;
+      document.getElementById('countdown-text').textContent = `Ready to track! Closing window in ${countdown} seconds...`;
+      
+      countdownInterval = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          triggerClose();
+        } else {
+          document.getElementById('countdown-text').textContent = `Ready to track! Closing window in ${countdown} seconds...`;
+        }
+      }, 1000);
+
+      function triggerClose() {
+        if (window.opener) {
+          window.opener.postMessage({ type: 'setup_success', workspaceId }, '*');
+        }
+        window.close();
+      }
+
+      document.getElementById('confirm-close-btn').onclick = () => {
+        if (countdownInterval) clearInterval(countdownInterval);
+        triggerClose();
+      };
+
+      document.getElementById('edit-mappings-btn').onclick = () => {
+        if (countdownInterval) clearInterval(countdownInterval);
+        document.getElementById('auto-success-view').style.display = 'none';
+        document.getElementById('mapping-form-section').style.display = 'block';
+        if (urlParams.get('is_popup') !== 'true') {
+          const embedSection = document.getElementById('embed-section');
+          if (embedSection) embedSection.style.display = 'block';
+        }
+        document.getElementById('save-button').style.display = 'flex';
+      };
+    }
+
+    async function initSetup() {
+      // Set Embed URL text
+      const embedUrl = `${window.location.origin}/?workspace_id=${workspaceId}`;
+      document.getElementById('embed-url').value = embedUrl;
+
+      // Check if running on localhost and show HTTPS warning
+      if (window.location.protocol === 'http:' && window.location.hostname === 'localhost') {
+        document.getElementById('embed-warning').style.display = 'block';
+      }
+
+      // Check if running in a popup and hide the embed section
+      if (urlParams.get('is_popup') === 'true') {
+        const embedSection = document.getElementById('embed-section');
+        if (embedSection) embedSection.style.display = 'none';
+      }
+
+      // Enable Copy Button
+      document.getElementById('copy-btn').addEventListener('click', () => {
+        navigator.clipboard.writeText(embedUrl).then(() => {
+          showToast("✓ Embed URL copied to clipboard!");
+        });
+      });
+
+      showLoading(true);
+      try {
+        // Fetch databases list and existing config
+        const [dbRes, configRes] = await Promise.all([
+          fetch(`/api/notion/databases?workspace_id=${workspaceId}`),
+          fetch(`/api/notion/config?workspace_id=${workspaceId}`)
+        ]);
+
+        if (dbRes.status !== 200) {
+          const err = await dbRes.json();
+          throw new Error(err.error || "Failed to load databases");
+        }
+
+        const databases = await dbRes.json();
+        const config = await configRes.json();
+
+        // Populate selects
+        const selects = ['movie', 'tv', 'book', 'anime', 'manga', 'game', 'comic'];
+        let allMapped = true;
+        selects.forEach(type => {
+          const select = document.getElementById(`map-${type}`);
+          databases.forEach(db => {
+            const opt = document.createElement('option');
+            opt.value = db.id;
+            opt.textContent = db.title;
+            select.appendChild(opt);
+          });
+
+          // Set existing mapping if available
+          if (config && config.databaseMappings && config.databaseMappings[type]) {
+            select.value = config.databaseMappings[type];
+          } else {
+            allMapped = false;
+          }
+        });
+
+        // Trigger Auto-success link confirmation if all categories are fully matched
+        if (allMapped && urlParams.get('is_popup') === 'true') {
+          showAutoSuccessView(config.databaseMappings, databases);
+        }
+
+      } catch (err) {
+        showError(`Error initializing setup: ${err.message}`);
+      } finally {
+        showLoading(false);
+      }
+
+      // Add Save Listener
+      document.getElementById('save-button').addEventListener('click', saveConfig);
+    }
+
+    function showLoading(isLoading) {
+      const btn = document.getElementById('save-button');
+      if (isLoading) {
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner" style="width:14px; height:14px; border-width:2px; display:inline-block; margin-right:4px;"></span> Loading databases...`;
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = `💾 Save Configuration`;
+      }
+    }
+
+    async function saveConfig() {
+      const btn = document.getElementById('save-button');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner" style="width:14px; height:14px; border-width:2px; display:inline-block; margin-right:4px;"></span> Saving...`;
+
+      const mappings = {
+        movie: document.getElementById('map-movie').value,
+        tv: document.getElementById('map-tv').value,
+        book: document.getElementById('map-book').value,
+        anime: document.getElementById('map-anime').value,
+        manga: document.getElementById('map-manga').value,
+        game: document.getElementById('map-game').value,
+        comic: document.getElementById('map-comic').value
+      };
+
+      try {
+        const res = await fetch('/api/notion/map', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ workspaceId, mappings })
+        });
+
+        const data = await res.json();
+        if (res.status !== 200) {
+          throw new Error(data.error || "Failed to save mappings");
+        }
+
+        showToast("✓ Configuration saved successfully!");
+
+        // If loaded in a popup window, inform the parent page and close
+        if (urlParams.get('is_popup') === 'true') {
+          setTimeout(() => {
+            if (window.opener) {
+              window.opener.postMessage({ type: 'setup_success', workspaceId }, '*');
+            }
+            window.close();
+          }, 1000);
+        }
+      } catch (err) {
+        showError(`Failed to save configuration: ${err.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `💾 Save Configuration`;
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

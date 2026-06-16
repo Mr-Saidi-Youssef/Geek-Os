@@ -1,0 +1,22 @@
+{
+  "done": {
+    "372d0aaf-19d0-809a-b9af-ec501c2f56a7": "skipped",
+    "372d0aaf-19d0-8188-b3bb-efd5ddd80947": "skipped",
+    "370d0aaf-19d0-812b-8e77-fcb74a481cee": "skipped",
+    "370d0aaf-19d0-8132-b7b9-f3aa53185216": "skipped",
+    "370d0aaf-19d0-81af-8289-c2f27a2e89f3": "skipped",
+    "370d0aaf-19d0-815c-9a03-f5b774b2c60c": "enriched",
+    "370d0aaf-19d0-8152-b6b7-e41e14322bac": "enriched",
+    "370d0aaf-19d0-81e6-b4ce-c37d7e44c085": "enriched",
+    "370d0aaf-19d0-817c-a897-dc190b28a4e3": "skipped",
+    "370d0aaf-19d0-81ee-bf9f-c1229abea0b4": "enriched",
+    "370d0aaf-19d0-81b2-89f0-c899624222b4": "enriched",
+    "370d0aaf-19d0-8165-9e06-d3ce2ba886e9": "enriched",
+    "370d0aaf-19d0-8152-886e-f4e7939e269c": "enriched",
+    "370d0aaf-19d0-8154-ae7f-e7833f4b5686": "enriched",
+    "370d0aaf-19d0-81a4-8dfc-c28fcb0db781": "enriched"
+  },
+  "enriched": 9,
+  "skipped": 6,
+  "failed": 0
+}

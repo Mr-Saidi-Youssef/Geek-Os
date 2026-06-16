@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=device-width, initial-scale=initial-scale=1.0">
+  <title>Notion Adder Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="glow-container">
+    <div class="glow-ball glow-purple"></div>
+    <div class="glow-ball glow-blue"></div>
+  </div>
+
+  <div class="widget-container">
+    <header class="widget-header">
+      <div class="logo-area">
+        <span class="logo-icon" id="logo-icon">🔮</span>
+        <div class="logo-text">
+          <h1 id="logo-title">Notion Adder</h1>
+          <p id="logo-subtitle">Add anything to your tracker in one click</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="nav-tabs" id="nav-tabs">
+      <button class="tab-btn active" data-type="movie">
+        <span class="tab-icon">🎬</span> Movies
+      </button>
+      <button class="tab-btn" data-type="tv">
+        <span class="tab-icon">📺</span> TV Shows
+      </button>
+      <button class="tab-btn" data-type="book">
+        <span class="tab-icon">📚</span> Books
+      </button>
+      <button class="tab-btn" data-type="anime">
+        <span class="tab-icon">🌸</span> Anime
+      </button>
+      <button class="tab-btn" data-type="manga">
+        <span class="tab-icon">📖</span> Manga
+      </button>
+      <button class="tab-btn" data-type="game">
+        <span class="tab-icon">🎮</span> Games
+      </button>
+      <button class="tab-btn" data-type="comic">
+        <span class="tab-icon">🦸</span> Comics
+      </button>
+    </nav>
+
+    <!-- Search Box Area -->
+    <div class="search-section">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search for a movie title..." autocomplete="off">
+        <button id="clear-btn" class="clear-btn" style="display: none;">✕</button>
+      </div>
+    </div>
+
+    <!-- Main Content Results -->
+    <main class="results-container">
+      <!-- Loading indicator -->
+      <div id="loading-spinner" class="loading-state" style="display: none;">
+        <div class="spinner"></div>
+        <p>Retrieving results...</p>
+      </div>
+
+      <!-- Initial/Empty state -->
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">✨</div>
+        <h3>Ready to Explore</h3>
+        <p>Type a title above to search the global metadata libraries.</p>
+      </div>
+
+      <!-- Recommendations Section -->
+      <div id="recommendations-section" class="recommendations-section" style="display: none;">
+        <!-- Trending Row -->
+        <div class="recs-row">
+          <div class="recs-row-header">
+            <h2 class="recs-row-title">🔥 Trending</h2>
+          </div>
+          <div class="recs-carousel-wrapper">
+            <button class="carousel-nav-btn prev-btn" aria-label="Previous">‹</button>
+            <div class="recs-carousel" id="trending-carousel"></div>
+            <button class="carousel-nav-btn next-btn" aria-label="Next">›</button>
+          </div>
+        </div>
+
+        <!-- Upcoming Row -->
+        <div class="recs-row">
+          <div class="recs-row-header">
+            <h2 class="recs-row-title">⏰ Upcoming</h2>
+          </div>
+          <div class="recs-carousel-wrapper">
+            <button class="carousel-nav-btn prev-btn" aria-label="Previous">‹</button>
+            <div class="recs-carousel" id="upcoming-carousel"></div>
+            <button class="carousel-nav-btn next-btn" aria-label="Next">›</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Grid -->
+      <div id="results-grid" class="results-grid" style="display: none;"></div>
+    </main>
+  </div>
+
+  <script src="recs_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
