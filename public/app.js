@@ -242,6 +242,21 @@ function showEmptyState() {
   UI.resultsGrid.style.display = 'none';
   UI.recommendationsSection.style.display = 'none';
   UI.emptyState.style.display = 'flex';
+  
+  // Reset empty state text to default
+  const iconEl = UI.emptyState.querySelector('.empty-icon');
+  if (iconEl) {
+    iconEl.textContent = '✨';
+    iconEl.style.opacity = '0.6';
+  }
+  const titleEl = UI.emptyState.querySelector('h3');
+  if (titleEl) {
+    titleEl.textContent = 'Ready to Explore';
+  }
+  const descEl = UI.emptyState.querySelector('p');
+  if (descEl) {
+    descEl.textContent = 'Type a title above to search the global metadata libraries.';
+  }
 }
 
 // Show loading state
@@ -475,14 +490,73 @@ function renderResults(items) {
   });
 }
 
+// Helper: get user-friendly parsed errors
+function getFriendlyError(message) {
+  const msg = (message || '').toLowerCase();
+  
+  if (msg.includes('504') || msg.includes('timeout') || msg.includes('gateway')) {
+    return {
+      icon: '🔌',
+      title: 'Service Temporarily Offline',
+      description: 'The external metadata library is currently down or overloaded. Please try again in a few minutes.'
+    };
+  }
+  
+  if (msg.includes('429') || msg.includes('too many requests')) {
+    return {
+      icon: '⏳',
+      title: 'Rate Limit Reached',
+      description: 'Too many search requests. Please wait a few seconds and try your search again.'
+    };
+  }
+
+  if (msg.includes('401') || msg.includes('unauthorized') || msg.includes('token') || msg.includes('workspace not linked')) {
+    return {
+      icon: '🔑',
+      title: 'Notion Disconnected',
+      description: 'Your Notion workspace authorization has expired or is missing. Please click the Settings gear to reconnect your account.'
+    };
+  }
+
+  if (msg.includes('400') || msg.includes('bad request') || msg.includes('not mapped')) {
+    return {
+      icon: '📁',
+      title: 'Database Mapping Required',
+      description: 'The Notion database for this category is not mapped yet. Please click the Settings gear to configure your mappings.'
+    };
+  }
+  
+  return {
+    icon: '⚠️',
+    title: 'Search Error',
+    description: message || 'An error occurred while fetching search results. Please check your connection and try again.'
+  };
+}
+
 // Render error state
 function renderError(message) {
   UI.loadingSpinner.style.display = 'none';
   UI.resultsGrid.style.display = 'none';
   UI.recommendationsSection.style.display = 'none';
   UI.emptyState.style.display = 'flex';
-  UI.emptyState.querySelector('h3').textContent = 'Search Error';
-  UI.emptyState.querySelector('p').textContent = message || 'An error occurred while fetching data. Check server logs.';
+  
+  const friendly = getFriendlyError(message);
+  
+  const iconEl = UI.emptyState.querySelector('.empty-icon');
+  if (iconEl) {
+    iconEl.textContent = friendly.icon;
+    iconEl.style.opacity = '1';
+  }
+  
+  const titleEl = UI.emptyState.querySelector('h3');
+  if (titleEl) {
+    titleEl.textContent = friendly.title;
+  }
+  
+  const descEl = UI.emptyState.querySelector('p');
+  if (descEl) {
+    descEl.textContent = friendly.description;
+  }
 }
 
 // Add item POST request
