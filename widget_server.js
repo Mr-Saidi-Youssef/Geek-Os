@@ -4,8 +4,69 @@ const axios = require('axios');
 const path = require('path');
 require('dotenv').config();
 const connectionsDb = require('./connections_db');
+const { put } = require('@vercel/blob');
+const { get: getEdgeConfig } = require('@vercel/edge-config');
 
 const app = express();
+
+// Middleware: Set Edge Cache headers for 24h
+function setEdgeCache(req, res, next) {
+  res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=3600');
+  next();
+}
+
+// Middleware: Check Vercel Edge Config feature flags
+async function checkFeatureFlag(category, res, next) {
+  if (!process.env.EDGE_CONFIG) {
+    return next();
+  }
+  try {
+    const flags = await getEdgeConfig('featureFlags');
+    if (flags && flags[category] === false) {
+      return res.status(403).json({
+        error: `The ${category || 'media'} search service is temporarily disabled.`,
+        code: 'SERVICE_DISABLED'
+      });
+    }
+  } catch (err) {
+    console.warn('⚠️ Edge Config flag check failed:', err.message);
+  }
+  next();
+}
+
+// Helper: Upload cover image to Vercel Blob storage
+async function uploadCoverToBlob(coverUrl, title, type) {
+  if (!coverUrl || coverUrl === 'N/A') return null;
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return coverUrl;
+  }
+  try {
+    console.log(`📸 Uploading cover to Vercel Blob for ${title} (${type})...`);
+    const response = await axios.get(coverUrl, { 
+      responseType: 'arraybuffer',
+      timeout: 6000
+    });
+    
+    const buffer = Buffer.from(response.data, 'binary');
+    const contentType = response.headers['content-type'] || 'image/jpeg';
+    const ext = contentType.split('/')[1] || 'jpg';
+    
+    const safeTitle = title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const filepath = `covers/${type}/${safeTitle}_${Date.now()}.${ext}`;
+    
+    const blob = await put(filepath, buffer, {
+      access: 'public',
+      contentType: contentType,
+      token: process.env.BLOB_READ_WRITE_TOKEN
+    });
+    
+    console.log(`✓ Uploaded cover to Vercel Blob: ${blob.url}`);
+    return blob.url;
+  } catch (err) {
+    console.warn(`⚠️ Failed to upload cover to Vercel Blob:`, err.message);
+    return coverUrl;
+  }
+}
 const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
@@ -1017,7 +1078,7 @@ app.post('/api/notion/map', async (req, res) => {
 // ─── Search APIs proxies ──────────────────────────────────────────────────────
 
 // Anime Search (Jikan MAL API)
-app.get('/api/search/anime', async (req, res) => {
+app.get('/api/search/anime', setEdgeCache, (req, res, next) => checkFeatureFlag('anime', res, next), async (req, res) => {
   try {
     const q = req.query.q;
     if (!q) return res.status(400).json({ error: 'Query missing' });
@@ -1044,7 +1105,7 @@ app.get('/api/search/anime', async (req, res) => {
 });
 
 // Manga Search (Jikan MAL API)
-app.get('/api/search/manga', async (req, res) => {
+app.get('/api/search/manga', setEdgeCache, (req, res, next) => checkFeatureFlag('manga', res, next), async (req, res) => {
   try {
     const q = req.query.q;
     if (!q) return res.status(400).json({ error: 'Query missing' });
@@ -1072,7 +1133,7 @@ app.get('/api/search/manga', async (req, res) => {
 });
 
 // TV Show Search (TVMaze API)
-app.get('/api/search/tv', async (req, res) => {
+app.get('/api/search/tv', setEdgeCache, (req, res, next) => checkFeatureFlag('tv', res, next), async (req, res) => {
   try {
     const q = req.query.q;
     if (!q) return res.status(400).json({ error: 'Query missing' });
@@ -1101,7 +1162,7 @@ app.get('/api/search/tv', async (req, res) => {
 });
 
 // Movie Search (OMDB API using free key)
-app.get('/api/search/movie', async (req, res) => {
+app.get('/api/search/movie', setEdgeCache, (req, res, next) => checkFeatureFlag('movie', res, next), async (req, res) => {
   try {
     const q = req.query.q;
     if (!q) return res.status(400).json({ error: 'Query missing' });
@@ -1142,7 +1203,7 @@ app.get('/api/search/movie', async (req, res) => {
 });
 
 // Game Search (Steam Store Search & App Details keyless APIs)
-app.get('/api/search/game', async (req, res) => {
+app.get('/api/search/game', setEdgeCache, (req, res, next) => checkFeatureFlag('game', res, next), async (req, res) => {
   try {
     const q = req.query.q;
     if (!q) return res.status(400).json({ error: 'Query missing' });
@@ -1233,7 +1294,7 @@ app.get('/api/search/game', async (req, res) => {
 });
 
 // Book & Comic Search (Google Books API with Open Library fallback)
-app.get('/api/search/book', async (req, res) => {
+app.get('/api/search/book', setEdgeCache, (req, res, next) => checkFeatureFlag('book', res, next), async (req, res) => {
   try {
     const q = req.query.q;
     if (!q) return res.status(400).json({ error: 'Query missing' });
@@ -1292,7 +1353,7 @@ app.get('/api/search/book', async (req, res) => {
 });
 
 // Comic Search (Open Library API keyless)
-app.get('/api/search/comic', async (req, res) => {
+app.get('/api/search/comic', setEdgeCache, (req, res, next) => checkFeatureFlag('comic', res, next), async (req, res) => {
   try {
     const q = req.query.q;
     if (!q) return res.status(400).json({ error: 'Query missing' });
@@ -1333,6 +1394,18 @@ app.post('/api/add', async (req, res) => {
   
   if (!type || !title) {
     return res.status(400).json({ error: 'Missing type or title' });
+  }
+
+  // Upload cover image to Vercel Blob if configured
+  if (cover) {
+    try {
+      const blobUrl = await uploadCoverToBlob(cover, title, type);
+      if (blobUrl) {
+        cover = blobUrl;
+      }
+    } catch (err) {
+      console.warn('⚠️ Cover upload skipped or failed:', err.message);
+    }
   }
 
   if (!workspaceId) {
