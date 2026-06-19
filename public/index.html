@@ -2,104 +2,176 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=device-width, initial-scale=initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notion Adder Hub</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+
+  <script>
+    (function() {
+      try {
+        let theme = localStorage.getItem('theme');
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
-  <div class="glow-container">
-    <div class="glow-ball glow-purple"></div>
-    <div class="glow-ball glow-blue"></div>
-  </div>
+  <div class="widget-container" style="position: relative;">
+    <div id="top-progress-bar" class="progress-bar"></div>
+    <div class="widget-header-group">
 
-  <div class="widget-container">
-    <header class="widget-header">
-      <div class="logo-area">
-        <span class="logo-icon" id="logo-icon">🔮</span>
-        <div class="logo-text">
-          <h1 id="logo-title">Notion Adder</h1>
-          <p id="logo-subtitle">Add anything to your tracker in one click</p>
+      <!-- Breadcrumb Header (Notion-style top bar) -->
+      <div class="breadcrumb-header">
+        <div class="breadcrumb-path">
+          <div class="breadcrumb-item">
+            <span class="breadcrumb-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            </span>
+            <span>Nerd Bundle</span>
+          </div>
+          <span class="breadcrumb-sep">/</span>
+          <div class="breadcrumb-item active" id="breadcrumb-active">Movies</div>
+        </div>
+        <div class="header-controls">
+          <div id="sync-status" class="sync-status unconnected">
+            <span class="status-dot"></span>
+            <span class="status-text">Checking...</span>
+          </div>
+          <button id="theme-toggle" class="icon-btn" title="Toggle Theme" aria-label="Toggle Theme">
+            <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </button>
+          <div class="settings-menu-container" style="position: relative;">
+            <button id="settings-menu-btn" class="icon-btn" title="Settings" aria-label="Settings Menu" aria-haspopup="true" aria-expanded="false" style="display: none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
+            <div id="settings-dropdown" class="settings-dropdown" role="menu" aria-label="Settings Menu" style="display: none;">
+              <a id="settings-btn" href="#" role="menuitem" class="dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                Mappings Setup
+              </a>
+              <a id="disconnect-btn" href="#" role="menuitem" class="dropdown-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon"><path d="M18.84 8.16l-3.3-3.3a5 5 0 0 0-7.07 0L4.54 8.78a5 5 0 0 0 0 7.07l.36.36M19.1 14.86l.36.36a5 5 0 0 1 0 7.07l-3.93 3.93a5 5 0 0 1-7.07 0l-3.3-3.3M15 9l-6 6"></path></svg>
+                Disconnect Workspace
+              </a>
+            </div>
+          </div>
         </div>
       </div>
-    </header>
 
-    <!-- Tab Navigation -->
-    <nav class="nav-tabs" id="nav-tabs">
-      <button class="tab-btn active" data-type="movie">
-        <span class="tab-icon">🎬</span> Movies
-      </button>
-      <button class="tab-btn" data-type="tv">
-        <span class="tab-icon">📺</span> TV Shows
-      </button>
-      <button class="tab-btn" data-type="book">
-        <span class="tab-icon">📚</span> Books
-      </button>
-      <button class="tab-btn" data-type="anime">
-        <span class="tab-icon">🌸</span> Anime
-      </button>
-      <button class="tab-btn" data-type="manga">
-        <span class="tab-icon">📖</span> Manga
-      </button>
-      <button class="tab-btn" data-type="game">
-        <span class="tab-icon">🎮</span> Games
-      </button>
-      <button class="tab-btn" data-type="comic">
-        <span class="tab-icon">🦸</span> Comics
-      </button>
-    </nav>
+      <!-- Tab Navigation -->
+      <nav class="nav-tabs" id="nav-tabs" role="tablist">
+        <button class="tab-btn active" data-type="movie" role="tab" aria-selected="true" tabindex="0">
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg></span> Movies
+        </button>
+        <button class="tab-btn" data-type="tv" role="tab" aria-selected="false" tabindex="-1">
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg></span> TV Shows
+        </button>
+        <button class="tab-btn" data-type="book" role="tab" aria-selected="false" tabindex="-1">
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></span> Books
+        </button>
+        <button class="tab-btn" data-type="anime" role="tab" aria-selected="false" tabindex="-1">
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></span> Anime
+        </button>
+        <button class="tab-btn" data-type="manga" role="tab" aria-selected="false" tabindex="-1">
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></span> Manga
+        </button>
+        <button class="tab-btn" data-type="game" role="tab" aria-selected="false" tabindex="-1">
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="3"></rect></svg></span> Games
+        </button>
+        <button class="tab-btn" data-type="comic" role="tab" aria-selected="false" tabindex="-1">
+          <span class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></span> Comics
+        </button>
+      </nav>
+    </div>
 
-    <!-- Search Box Area -->
+    <!-- Search Box Area (outside sticky group — scrolls with content) -->
     <div class="search-section">
+      <!-- Temporary Connection Banner -->
+      <div id="temp-connection-banner" class="embed-warning-banner" style="display: none; margin: 0 0 12px 0; font-size: 11px; padding: 8px 10px; border-radius: 6px; align-items: center; justify-content: space-between; gap: 8px; width: 100%; box-sizing: border-box;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline" style="color: var(--banner-warn-text); width: 14px; height: 14px; margin-right: 0; flex-shrink: 0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span style="color: var(--banner-warn-text); font-weight: 500;"><strong>Temporary Connection:</strong> Copy the permanent URL to keep it connected.</span>
+        </div>
+        <button id="temp-connection-btn" class="btn-secondary" style="padding: 4px 8px; font-size: 10px; margin: 0; background: var(--search-bg); border-color: var(--border-light); color: var(--text-main); cursor: pointer; flex-shrink: 0;">Get Link</button>
+      </div>
+
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
         <input type="text" id="search-input" placeholder="Search for a movie title..." autocomplete="off">
         <button id="clear-btn" class="clear-btn" style="display: none;">✕</button>
+        <div id="search-dropdown" class="search-dropdown" style="display: none;" role="listbox" aria-label="Search suggestions"></div>
+      </div>
+    </div>
+
+    <!-- Advanced Filter & Sort Bar -->
+    <div id="control-bar" class="control-bar" style="display: none;">
+      <div class="control-filters">
+        <span class="filter-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+        <input type="text" id="local-filter" placeholder="Filter current results..." autocomplete="off">
+      </div>
+      <div class="control-sorts">
+        <span class="sort-label">Sort:</span>
+        <button class="sort-btn active" data-sort="default">Default</button>
+        <button class="sort-btn" data-sort="year">Year <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon sort-arrow" style="width: 10px; height: 10px; margin-left: 4px; display: inline-block; vertical-align: middle;"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+        <button class="sort-btn" data-sort="rating">Rating <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon sort-arrow" style="width: 10px; height: 10px; margin-left: 4px; display: inline-block; vertical-align: middle;"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+        <button class="sort-btn" data-sort="title">Title <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon sort-arrow" style="width: 10px; height: 10px; margin-left: 4px; display: inline-block; vertical-align: middle;"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
       </div>
     </div>
 
     <!-- Main Content Results -->
     <main class="results-container">
-      <!-- Loading indicator -->
-      <div id="loading-spinner" class="loading-state" style="display: none;">
-        <div class="spinner"></div>
-        <p>Retrieving results...</p>
+      <!-- Loading skeletons (replaces generic spinner) -->
+      <div id="loading-spinner" class="results-grid" style="display: none;">
+        <div class="media-card skeleton-card">
+          <div class="card-cover-wrapper skeleton-cover"></div>
+          <div class="card-details">
+            <div class="card-info">
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line subtitle"></div>
+              <div class="skeleton-line badges"></div>
+            </div>
+            <div class="card-actions">
+              <div class="skeleton-line button"></div>
+            </div>
+          </div>
+        </div>
+        <div class="media-card skeleton-card">
+          <div class="card-cover-wrapper skeleton-cover"></div>
+          <div class="card-details">
+            <div class="card-info">
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line subtitle"></div>
+              <div class="skeleton-line badges"></div>
+            </div>
+            <div class="card-actions">
+              <div class="skeleton-line button"></div>
+            </div>
+          </div>
+        </div>
+        <div class="media-card skeleton-card">
+          <div class="card-cover-wrapper skeleton-cover"></div>
+          <div class="card-details">
+            <div class="card-info">
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line subtitle"></div>
+              <div class="skeleton-line badges"></div>
+            </div>
+            <div class="card-actions">
+              <div class="skeleton-line button"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Initial/Empty state -->
       <div id="empty-state" class="empty-state">
-        <div class="empty-icon">✨</div>
+        <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px; opacity: 0.35;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
         <h3>Ready to Explore</h3>
         <p>Type a title above to search the global metadata libraries.</p>
-      </div>
-
-      <!-- Recommendations Section -->
-      <div id="recommendations-section" class="recommendations-section" style="display: none;">
-        <!-- Trending Row -->
-        <div class="recs-row">
-          <div class="recs-row-header">
-            <h2 class="recs-row-title">🔥 Trending</h2>
-          </div>
-          <div class="recs-carousel-wrapper">
-            <button class="carousel-nav-btn prev-btn" aria-label="Previous">‹</button>
-            <div class="recs-carousel" id="trending-carousel"></div>
-            <button class="carousel-nav-btn next-btn" aria-label="Next">›</button>
-          </div>
-        </div>
-
-        <!-- Upcoming Row -->
-        <div class="recs-row">
-          <div class="recs-row-header">
-            <h2 class="recs-row-title">⏰ Upcoming</h2>
-          </div>
-          <div class="recs-carousel-wrapper">
-            <button class="carousel-nav-btn prev-btn" aria-label="Previous">‹</button>
-            <div class="recs-carousel" id="upcoming-carousel"></div>
-            <button class="carousel-nav-btn next-btn" aria-label="Next">›</button>
-          </div>
-        </div>
       </div>
 
       <!-- Results Grid -->
@@ -107,7 +179,198 @@
     </main>
   </div>
 
-  <script src="recs_data.js"></script>
-  <script src="app.js"></script>
+  <!-- Details & Configuration Popover Modal -->
+  <div id="details-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <!-- Cover image at the top of the modal -->
+      <div class="modal-cover-banner">
+        <img id="modal-cover-img" src="" alt="Cover Art" style="display: none;">
+        <span id="modal-cover-placeholder" class="modal-cover-placeholder"></span>
+      </div>
+
+      <button id="modal-close-btn" class="modal-close-btn">✕</button>
+
+      <div class="modal-page-body">
+        <div class="modal-header-section">
+          <h2 id="modal-title" class="notion-modal-title">Media Title</h2>
+        </div>
+
+        <!-- Notion Properties Section -->
+        <div class="notion-properties-list">
+          <div class="notion-property-row">
+            <div class="notion-property-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="2"></circle></svg> Status
+            </div>
+            <div class="notion-property-value">
+              <select id="modal-status-select" class="mapping-select">
+                <option value="Inbox">Inbox</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="notion-property-row">
+            <div class="notion-property-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg> Genres
+            </div>
+            <div class="notion-property-value" id="modal-genres">
+              <!-- Genres will be filled dynamically -->
+            </div>
+          </div>
+
+          <div class="notion-property-row">
+            <div class="notion-property-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> Info
+            </div>
+            <div class="notion-property-value" id="modal-subtitle">
+              <!-- Subtitle details (Director, Author, Year, etc.) -->
+            </div>
+          </div>
+        </div>
+
+        <hr class="notion-divider">
+
+        <!-- Page Content -->
+        <div class="notion-page-content">
+          <div class="modal-synopsis-section">
+            <h3 class="notion-h3">Synopsis</h3>
+            <p id="modal-synopsis">Synopsis description...</p>
+          </div>
+
+          <!-- Embedded YouTube Video Container -->
+          <div id="modal-video-container" class="video-container" style="display: none; margin-top: 16px;">
+            <iframe id="modal-video-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div id="modal-video-link-container" style="margin-top: 8px; text-align: center;">
+              <a id="modal-video-direct-link" href="#" target="_blank" class="info-link" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; text-decoration: none; padding: 6px 12px; border-radius: 6px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Watch on YouTube <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon" style="width:10px; height:10px;"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Banner (Success / Duplicate) -->
+        <div id="modal-info-banner" class="info-banner" style="display: none;">
+          <span id="modal-info-icon" class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px; height:14px; display:block;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+          <div class="info-content">
+            <span id="modal-info-text" class="info-text">Already exists in your library.</span>
+            <div class="info-links">
+              <a id="modal-open-link" href="#" target="_blank" class="info-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Open Page</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions-row">
+          <button id="modal-cancel-btn" class="btn-secondary" style="flex: 1; padding: 8px 12px; margin: 0;">Cancel</button>
+          <button id="modal-add-btn" class="save-btn" style="flex: 2; margin: 0; padding: 8px 12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline" style="width:12px; height:12px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add to Notion
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal (Notion-style Database mapping) -->
+  <div id="settings-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 600px; padding: 24px;">
+      <button id="settings-close-btn" class="modal-close-btn">✕</button>
+      <div class="modal-page-body" style="padding-top: 10px;">
+        <div class="modal-header-section" style="margin-bottom: 20px;">
+          <h2 class="notion-modal-title" style="display: flex; align-items: center; gap: 8px; font-size: 16px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            Database Mappings
+          </h2>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Select the database from your workspace that corresponds to each media category.</p>
+        </div>
+
+        <div id="settings-error" class="info-banner" style="display: none; margin-bottom: 16px; background: rgba(235, 87, 87, 0.1); border-color: rgba(235, 87, 87, 0.3); color: var(--red); padding: 10px; border-radius: 4px; font-size: 12px;">
+          <!-- Error details here -->
+        </div>
+
+        <form id="settings-mapping-form" class="mapping-grid">
+          <!-- Form fields for mapping -->
+          <div class="mapping-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline" style="width: 14px; height: 14px; margin-right: 6px;"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line></svg> Movies</div>
+          <div>
+            <select id="settings-map-movie" class="mapping-select" name="movie">
+              <option value="">Loading databases...</option>
+            </select>
+          </div>
+
+          <div class="mapping-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline" style="width: 14px; height: 14px; margin-right: 6px;"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg> TV Shows</div>
+          <div>
+            <select id="settings-map-tv" class="mapping-select" name="tv">
+              <option value="">Loading databases...</option>
+            </select>
+          </div>
+
+          <div class="mapping-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline" style="width: 14px; height: 14px; margin-right: 6px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> Books</div>
+          <div>
+            <select id="settings-map-book" class="mapping-select" name="book">
+              <option value="">Loading databases...</option>
+            </select>
+          </div>
+
+          <div class="mapping-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline" style="width: 14px; height: 14px; margin-right: 6px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Anime</div>
+          <div>
+            <select id="settings-map-anime" class="mapping-select" name="anime">
+              <option value="">Loading databases...</option>
+            </select>
+          </div>
+
+          <div class="mapping-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline" style="width: 14px; height: 14px; margin-right: 6px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg> Manga</div>
+          <div>
+            <select id="settings-map-manga" class="mapping-select" name="manga">
+              <option value="">Loading databases...</option>
+            </select>
+          </div>
+
+          <div class="mapping-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline" style="width: 14px; height: 14px; margin-right: 6px;"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><rect x="2" y="6" width="20" height="12" rx="3"></rect></svg> Games</div>
+          <div>
+            <select id="settings-map-game" class="mapping-select" name="game">
+              <option value="">Loading databases...</option>
+            </select>
+          </div>
+
+          <div class="mapping-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline" style="width: 14px; height: 14px; margin-right: 6px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> Comics</div>
+          <div>
+            <select id="settings-map-comic" class="mapping-select" name="comic">
+              <option value="">Loading databases...</option>
+            </select>
+          </div>
+        </form>
+
+        <div class="modal-actions-row" style="margin-top: 24px;">
+          <button id="settings-cancel-btn" class="btn-secondary" style="flex: 1; margin: 0;">Cancel</button>
+          <button id="settings-save-btn" class="save-btn" style="flex: 1.5; margin: 0;">
+            Save Mappings
+          </button>
+        </div>
+
+        <hr class="notion-divider" style="margin: 20px 0;">
+
+        <!-- Embed inside Notion Section -->
+        <div id="settings-embed-section" style="margin-top: 20px;">
+          <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; color: var(--text-main);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="notion-icon notion-icon-inline" style="width: 16px; height: 16px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            Embed inside Notion
+          </h3>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Copy this permanent URL and paste it as your Notion Embed block link. This keeps the widget connected permanently across reloads.
+          </p>
+          <div id="settings-embed-urls" style="display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto; padding-right: 4px;">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Lightbox Overlay -->
+  <div id="video-lightbox" class="lightbox-overlay" style="display: none;">
+    <button id="lightbox-close-btn" class="lightbox-close-btn">✕</button>
+    <div class="lightbox-content">
+      <iframe id="lightbox-video-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script src="app.js?v=15"></script>
 </body>
 </html>

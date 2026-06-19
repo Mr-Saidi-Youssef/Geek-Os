@@ -1,174 +1,377 @@
-/* --- Global Reset & Variables --- */
+/* ============================================================
+   Notion Adder Hub — Notion-Native Style System
+   Dark mode default. Light mode via [data-theme="light"]
+   All tokens match Notion's exact design language.
+   ============================================================ */
+
+/* --- CSS Variables — Dark Mode (default) --- */
 :root {
-  --bg-dark: #090a0f;
-  --panel-bg: rgba(13, 15, 23, 0.45);
-  --border-light: rgba(255, 255, 255, 0.05);
-  --border-glow: rgba(144, 94, 255, 0.15);
-  
-  --primary-glow: #905eff;
-  --secondary-glow: #00d2ff;
-  
-  --text-main: #f3f4f6;
-  --text-muted: #9ca3af;
-  --text-dark: #6b7280;
-  
-  --card-bg: rgba(20, 23, 36, 0.5);
-  --card-hover-border: rgba(144, 94, 255, 0.4);
-  
-  --font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-  --font-header: 'Outfit', sans-serif;
+  /* Core backgrounds */
+  --bg:           #191919;
+  --panel-bg:     #191919;
+  --card-bg:      #202020;
+  --search-bg:    #202020;
+  --control-bg:   #202020;
+
+  /* Borders */
+  --border:       rgba(255, 255, 255, 0.095);
+  --border-hover: rgba(255, 255, 255, 0.16);
+
+  /* Typography */
+  --text:         rgba(255, 255, 255, 0.9);
+  --text-muted:   rgba(255, 255, 255, 0.5);
+  --text-faint:   rgba(255, 255, 255, 0.3);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Notion blue accent */
+  --accent:       #2383e2;
+
+  /* Tab states */
+  --tab-active-bg:   rgba(255, 255, 255, 0.08);
+  --tab-hover-bg:    rgba(255, 255, 255, 0.055);
+  --btn-hover-bg:    rgba(255, 255, 255, 0.055);
+  --btn-active-bg:   rgba(255, 255, 255, 0.08);
+
+  /* Notion status colors */
+  --green:  #529e72;
+  --yellow: #cb912f;
+  --red:    #eb5757;
+
+  /* Modal */
+  --overlay-bg:    rgba(0, 0, 0, 0.5);
+  --modal-bg:      #191919;
+  --modal-shadow:  rgba(15,15,15,.2) 0 0 0 1px, rgba(15,15,15,.3) 0 3px 6px, rgba(15,15,15,.5) 0 9px 24px;
+
+  /* Skeleton */
+  --skeleton-bg:  rgba(255, 255, 255, 0.03);
+  --skeleton-shimmer: linear-gradient(90deg, transparent, rgba(255,255,255,.05), transparent);
+
+  /* Info banners */
+  --banner-warn-bg:    rgba(203, 145, 47, 0.15);
+  --banner-warn-border: rgba(203, 145, 47, 0.3);
+  --banner-warn-text:  #cb912f;
+  --banner-ok-bg:      rgba(82, 158, 114, 0.12);
+  --banner-ok-border:  rgba(82, 158, 114, 0.3);
+  --banner-ok-text:    #529e72;
 }
 
-* {
+/* --- CSS Variables — Light Mode --- */
+:root[data-theme="light"] {
+  --bg:           #ffffff;
+  --panel-bg:     #ffffff;
+  --card-bg:      #fbfbfa;
+  --search-bg:    #f7f7f5;
+  --control-bg:   #f7f7f5;
+
+  --border:       rgba(55, 53, 47, 0.09);
+  --border-hover: rgba(55, 53, 47, 0.18);
+
+  --text:         #37352f;
+  --text-muted:   rgba(55, 53, 47, 0.65);
+  --text-faint:   rgba(55, 53, 47, 0.4);
+
+  --accent:       #2383e2;
+
+  --tab-active-bg:  rgba(55, 53, 47, 0.06);
+  --tab-hover-bg:   rgba(55, 53, 47, 0.04);
+  --btn-hover-bg:   rgba(55, 53, 47, 0.04);
+  --btn-active-bg:  rgba(55, 53, 47, 0.06);
+
+  --overlay-bg:   rgba(15, 15, 15, 0.3);
+  --modal-bg:     #ffffff;
+  --modal-shadow: rgba(15,15,15,.05) 0 0 0 1px, rgba(15,15,15,.1) 0 3px 6px, rgba(15,15,15,.15) 0 9px 24px;
+
+  --skeleton-bg:  rgba(55, 53, 47, 0.04);
+  --skeleton-shimmer: linear-gradient(90deg, transparent, rgba(55,53,47,.05), transparent);
+
+  --banner-warn-bg:    rgba(251, 236, 221, 0.85);
+  --banner-warn-border: rgba(203, 145, 47, 0.3);
+  --banner-warn-text:  #9a6b00;
+  --banner-ok-bg:      rgba(219, 237, 219, 0.6);
+  --banner-ok-border:  rgba(82, 158, 114, 0.3);
+  --banner-ok-text:    #1d6c4a;
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* ============================================================
+   BODY & SCROLLBARS
+   ============================================================ */
 body {
-  background-color: var(--bg-dark);
-  font-family: var(--font-family);
-  color: var(--text-main);
+  background: var(--bg);
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--text);
   min-height: 100vh;
-  overflow-x: hidden;
-  padding: 16px;
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: flex-start;
 }
 
-/* --- Gradient Glow Background balls --- */
-.glow-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+/* ============================================================
+   EMBEDDED MODE — strip all outer chrome
+   ============================================================ */
+body.is-embedded {
+  padding: 0;
+}
+body.is-embedded .widget-container {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+body.is-embedded .widget-header-group {
+  margin: 0;
+  padding: 0 16px;
+  border-radius: 0;
 }
 
-.glow-ball {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.15;
-}
-
-.glow-purple {
-  width: 400px;
-  height: 400px;
-  background: var(--primary-glow);
-  top: -100px;
-  right: -50px;
-}
-
-.glow-blue {
-  width: 400px;
-  height: 400px;
-  background: var(--secondary-glow);
-  bottom: -100px;
-  left: -50px;
-}
-
-/* --- Container Widget --- */
+/* ============================================================
+   WIDGET CONTAINER
+   ============================================================ */
 .widget-container {
   width: 100%;
   max-width: 960px;
   background: var(--panel-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-light);
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.6s ease-out;
+  position: relative;
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* --- Header Section --- */
-.widget-header {
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--border-light);
-  padding-bottom: 16px;
-}
-
-.logo-area {
+/* ============================================================
+   NOTION-STYLE BREADCRUMB HEADER
+   (replaces the old logo/title/subtitle block)
+   ============================================================ */
+.breadcrumb-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  padding: 10px 16px 0;
+  min-height: 44px;
 }
 
-.logo-icon {
-  font-size: 2rem;
-  filter: drop-shadow(0 0 10px rgba(144, 94, 255, 0.4));
-}
-
-.logo-text h1 {
-  font-family: var(--font-header);
-  font-weight: 700;
-  font-size: 1.5rem;
-  letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #ffffff 40%, #cac0ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.logo-text p {
-  font-size: 0.8rem;
+.breadcrumb-path {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
   color: var(--text-muted);
-  margin-top: 2px;
+  font-weight: 500;
+  line-height: 1;
+  user-select: none;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
-/* --- Navigation Tabs --- */
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.breadcrumb-item.active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.breadcrumb-sep {
+  color: var(--text-faint);
+  font-size: 12px;
+  flex-shrink: 0;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.breadcrumb-icon {
+  display: flex;
+  align-items: center;
+}
+.breadcrumb-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  flex-shrink: 0;
+}
+
+/* Right-side header controls */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Compact icon button — matches Notion's header icons */
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  padding: 0;
+}
+.icon-btn:hover {
+  background: var(--btn-hover-bg);
+  color: var(--text);
+}
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  display: block;
+}
+
+/* Theme icon toggling */
+.theme-icon-light,
+.theme-icon-dark {
+  display: none;
+  width: 16px;
+  height: 16px;
+}
+[data-theme="dark"] .theme-icon-light  { display: block; }
+[data-theme="light"] .theme-icon-dark  { display: block; }
+:root:not([data-theme]) .theme-icon-light { display: block; }
+
+/* Sync status — compact inline dot + text, no pill */
+.sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-faint);
+  padding: 0 4px;
+}
+.sync-status.connected   { color: var(--green); }
+.sync-status.unconnected { color: var(--yellow); }
+.sync-status.failed      { color: var(--red); }
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  position: relative;
+}
+.sync-status.connected .status-dot::after,
+.sync-status.unconnected .status-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%   { transform: scale(1); opacity: .7; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* Hide the old header elements that get replaced by breadcrumb */
+.logo-area, .logo-icon, .logo-text { display: none; }
+.widget-header { display: none; }
+
+/* ============================================================
+   STICKY HEADER GROUP
+   (wraps breadcrumb + tabs)
+   ============================================================ */
+.widget-header-group {
+  position: sticky;
+  top: 0;
+  background: var(--panel-bg);
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ============================================================
+   NAV TABS — Notion Database View style
+   Bottom-border active indicator, wraps on narrow containers
+   ============================================================ */
 .nav-tabs {
   display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 20px;
-  scrollbar-width: none; /* Firefox */
-}
-
-.nav-tabs::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  flex-wrap: wrap;
+  gap: 0;
+  padding: 0 8px;
+  overflow: visible;
 }
 
 .tab-btn {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-light);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
   color: var(--text-muted);
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-family: var(--font-family);
-  font-size: 0.85rem;
+  padding: 8px 10px;
+  margin-bottom: -1px;   /* overlap the border-bottom of nav wrapper */
+  border-radius: 0;
+  font-family: var(--font);
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: color 0.1s, border-color 0.1s, background 0.1s;
 }
 
 .tab-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-main);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--tab-hover-bg);
+  color: var(--text);
+  border-radius: 4px 4px 0 0;
 }
 
 .tab-btn.active {
-  background: linear-gradient(135deg, rgba(144, 94, 255, 0.15), rgba(0, 210, 255, 0.05));
-  border-color: rgba(144, 94, 255, 0.3);
-  color: #ffffff;
-  box-shadow: 0 0 15px rgba(144, 94, 255, 0.1);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  border-bottom-color: var(--text);
+  color: var(--text);
+  font-weight: 600;
 }
 
-/* --- Search Bar --- */
+.tab-icon {
+  display: flex;
+  align-items: center;
+}
+.tab-icon svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  display: block;
+}
+
+/* ============================================================
+   MAIN CONTENT AREA — padding + search
+   ============================================================ */
 .search-section {
-  margin-bottom: 24px;
+  padding: 12px 16px 0;
 }
 
 .search-wrapper {
@@ -178,387 +381,1474 @@ body {
 
 .search-icon {
   position: absolute;
-  left: 16px;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-muted);
-  font-size: 1.1rem;
+  color: var(--text-faint);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.search-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
 }
 
 #search-input {
   width: 100%;
-  background: rgba(10, 11, 18, 0.8);
-  border: 1px solid var(--border-light);
-  color: var(--text-main);
-  padding: 14px 44px;
-  border-radius: 14px;
-  font-family: var(--font-family);
-  font-size: 0.95rem;
+  background: var(--search-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 7px 32px 7px 32px;
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 13px;
   outline: none;
-  transition: all 0.3s ease;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-
+#search-input::placeholder { color: var(--text-faint); }
 #search-input:focus {
-  border-color: var(--primary-glow);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 15px rgba(144, 94, 255, 0.15);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.2);
 }
 
 .clear-btn {
   position: absolute;
-  right: 16px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: var(--text-muted);
-  font-size: 1rem;
+  color: var(--text-faint);
+  font-size: 12px;
   cursor: pointer;
   padding: 4px;
-}
-
-.clear-btn:hover {
-  color: var(--text-main);
-}
-
-/* --- Results Layout --- */
-.results-container {
-  min-height: 250px;
-}
-
-/* States */
-.loading-state {
+  border-radius: 3px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 0;
-  gap: 16px;
+}
+.clear-btn:hover { color: var(--text); background: var(--btn-hover-bg); }
+
+/* Search Autocomplete Dropdown */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: var(--modal-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: var(--modal-shadow);
+  padding: 4px 0;
+}
+
+.search-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.1s;
+  user-select: none;
+}
+.search-dropdown-item:hover,
+.search-dropdown-item.highlighted {
+  background: var(--btn-hover-bg);
+}
+
+.dropdown-item-cover {
+  width: 28px;
+  height: 40px;
+  border-radius: 3px;
+  object-fit: cover;
+  background: var(--card-bg);
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dropdown-item-placeholder { font-size: 14px; opacity: .35; }
+.dropdown-item-details { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.dropdown-item-title {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.dropdown-item-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+:root[data-theme="light"] .search-dropdown {
+  background: #ffffff;
+}
+
+/* ============================================================
+   CONTROL BAR — Notion filter/sort inline row
+   ============================================================ */
+#control-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
   animation: fadeIn 0.3s ease;
 }
 
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(144, 94, 255, 0.1);
-  border-top-color: var(--primary-glow);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+.control-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--search-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 5px 10px;
+  flex: 1;
+  min-width: 140px;
+}
+.control-filters:focus-within {
+  border-color: var(--accent);
+}
+.filter-icon { display: flex; align-items: center; opacity: .5; }
+.filter-icon svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2; fill: none; }
+.control-filters input {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  outline: none;
+  font-family: var(--font);
+  font-size: 12px;
+  width: 100%;
+}
+.control-filters input::placeholder { color: var(--text-faint); }
+
+.control-sorts {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sort-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-right: 2px;
+}
+.sort-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: background 0.1s, color 0.1s;
+}
+.sort-btn:hover { background: var(--btn-hover-bg); color: var(--text); }
+.sort-btn.active {
+  background: var(--btn-active-bg);
+  color: var(--text);
+  font-weight: 600;
+}
+.sort-arrow { width: 10px; height: 10px; }
+
+/* ============================================================
+   RESULTS GRID — Notion Gallery View
+   ============================================================ */
+.results-container {
+  padding: 12px 16px 16px;
+  min-height: 200px;
 }
 
+/* Gallery grid — 4 cols on wide, auto-fills down */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ---- Media Card ---- */
+.media-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, box-shadow 0.1s;
+}
+.media-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: rgba(15,15,15,.05) 0 1px 3px;
+}
+
+/* Cover area */
+.card-cover-wrapper {
+  width: 100%;
+  height: 190px;
+  overflow: hidden;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.card-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover-placeholder {
+  opacity: .3;
+}
+.cover-placeholder svg,
+.placeholder-icon-svg {
+  width: 28px;
+  height: 28px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+  opacity: .35;
+}
+
+/* Card body */
+.card-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 8px 10px 10px;
+  gap: 4px;
+}
+.card-info { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.card-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.meta-badge {
+  background: var(--search-bg);
+  border: 1px solid var(--border);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.badge-score {
+  border-color: rgba(35, 131, 226, 0.25);
+  color: var(--accent);
+}
+
+/* Card action button */
+.card-actions { margin-top: 6px; }
+.add-btn {
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: filter 0.1s;
+}
+.add-btn:hover { filter: brightness(0.9); }
+.add-btn.loading {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.add-btn.success {
+  background: var(--green);
+  pointer-events: none;
+}
+
+.inline-details-btn {
+  background: transparent !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+}
+.media-card:hover .inline-details-btn {
+  background: var(--btn-hover-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--border-hover) !important;
+}
+
+/* ============================================================
+   EMPTY / LOADING STATES
+   ============================================================ */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 64px 20px;
+  padding: 60px 20px;
   color: var(--text-muted);
   animation: fadeIn 0.4s ease;
 }
-
-.empty-icon {
-  font-size: 2.5rem;
-  margin-bottom: 12px;
-  opacity: 0.6;
-}
-
+.empty-icon { margin-bottom: 10px; }
+.empty-icon svg { width: 28px; height: 28px; stroke: currentColor; stroke-width: 1.8; fill: none; opacity: .3; }
 .empty-state h3 {
-  font-family: var(--font-header);
-  font-size: 1.15rem;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.empty-state p { font-size: 13px; color: var(--text-muted); }
+
+/* Skeleton cards */
+.skeleton-card { pointer-events: none; opacity: .7; }
+.skeleton-cover {
+  background: var(--skeleton-bg) !important;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-cover::after,
+.skeleton-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--skeleton-shimmer);
+  transform: translateX(-100%);
+  animation: shimmer 1.6s infinite;
+}
+.skeleton-line {
+  height: 11px;
+  background: var(--skeleton-bg);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
   margin-bottom: 6px;
-  color: var(--text-main);
+}
+.skeleton-line.title   { height: 14px; width: 70%; }
+.skeleton-line.subtitle{ height: 10px; width: 45%; }
+.skeleton-line.badges  { height: 10px; width: 30%; margin-bottom: 0; }
+.skeleton-line.button  { height: 27px; width: 100%; border-radius: 3px; }
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
+/* No-matches inline */
+.no-matches-view {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+.no-matches-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.no-matches-text  { font-size: 12px; color: var(--text-muted); }
+
+/* Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   PROGRESS BAR (top of widget)
+   ============================================================ */
+.progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.4s cubic-bezier(0.1, 0.8, 0.1, 1);
+  display: none;
+  z-index: 200;
 }
 
-/* Grid Layout */
-.results-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-  animation: fadeIn 0.4s ease-out;
-}
-
-/* Media Cards */
-.media-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-light);
-  border-radius: 16px;
+/* ============================================================
+   MODAL — Notion full page style
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg);
+  backdrop-filter: blur(4px);
   display: flex;
-  gap: 14px;
-  padding: 12px;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  justify-content: center;
+  align-items: flex-start;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-out;
+  padding: 40px 16px 16px;
+  overflow-y: auto;
 }
 
-.media-card:hover {
-  border-color: var(--card-hover-border);
-  background: rgba(20, 23, 36, 0.7);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(144, 94, 255, 0.08);
+.modal-content {
+  background: var(--modal-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 100%;
+  max-width: 720px;
+  position: relative;
+  box-shadow: var(--modal-shadow);
+  animation: scaleIn 0.18s ease-out;
+  overflow: hidden;
 }
 
-.card-cover-wrapper {
-  width: 80px;
-  height: 120px;
-  border-radius: 8px;
+.modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.1s, color 0.1s;
+}
+.modal-close-btn:hover { background: var(--btn-hover-bg); color: var(--text); }
+
+/* Cover banner */
+.modal-cover-banner {
+  width: 100%;
+  height: 160px;
   overflow: hidden;
-  background: #111218;
-  flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  background: var(--search-bg);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-.card-cover {
+.modal-cover-banner img { width: 100%; height: 100%; object-fit: cover; }
+.modal-cover-placeholder {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: .25;
 }
+.modal-cover-placeholder svg { width: 40px; height: 40px; stroke: currentColor; stroke-width: 1.5; fill: none; }
 
-.cover-placeholder {
-  font-size: 1.5rem;
-  opacity: 0.3;
-}
-
-.card-details {
+.modal-page-body {
+  padding: 20px 24px 24px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  flex-grow: 1;
-  min-width: 0; /* Enable text truncation */
+  gap: 14px;
 }
 
-.card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.card-title {
-  font-size: 0.95rem;
-  font-weight: 600;
+/* Notion-style page title */
+.notion-modal-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
   line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.card-subtitle {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.card-meta {
+/* Property sheet */
+.notion-properties-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 4px;
+  flex-direction: column;
+  gap: 2px;
 }
+.notion-property-row {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  border-radius: 3px;
+  padding: 0 4px;
+  margin: 0 -4px;
+  transition: background 0.1s;
+}
+.notion-property-row:hover { background: var(--btn-hover-bg); }
 
-.meta-badge {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-light);
-  font-size: 0.65rem;
-  padding: 2px 6px;
-  border-radius: 6px;
+.notion-property-label {
+  width: 128px;
+  flex-shrink: 0;
   color: var(--text-muted);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.notion-property-label .notion-icon { width: 14px; height: 14px; opacity: .7; }
+
+.notion-property-value {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
 }
 
-.badge-score {
-  border-color: rgba(0, 210, 255, 0.2);
-  color: var(--secondary-glow);
+/* Notion divider */
+.notion-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
 }
 
-/* Actions Button */
-.card-actions {
+/* Synopsis block */
+.notion-page-content { display: flex; flex-direction: column; gap: 12px; }
+.notion-h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.modal-synopsis-section p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+/* Status select */
+.mapping-select {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--text) !important;
+  padding: 3px 24px 3px 6px !important;
+  border-radius: 3px !important;
+  font-family: var(--font) !important;
+  font-size: 13px !important;
+  outline: none !important;
+  cursor: pointer !important;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 6px center !important;
+  background-size: 12px !important;
+  width: auto !important;
+  transition: background 0.1s, border-color 0.1s !important;
+}
+.mapping-select:hover {
+  border-color: var(--border) !important;
+  background-color: var(--btn-hover-bg) !important;
+}
+.mapping-select:focus {
+  border-color: var(--accent) !important;
+}
+.mapping-select option {
+  background: var(--modal-bg) !important;
+  color: var(--text) !important;
+}
+
+/* Trailer video embed */
+.video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #000;
+  cursor: pointer;
+}
+.video-container iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.video-container::after {
+  content: 'Click to expand';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  color: rgba(255,255,255,.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.video-container:hover::after { opacity: 1; }
+.video-container:hover { border-color: var(--border-hover); }
+
+/* Lightbox */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,10,.88);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2200;
+  animation: fadeIn 0.2s ease;
+}
+.lightbox-content {
+  position: relative;
+  width: 90%;
+  max-width: 720px;
+  aspect-ratio: 16 / 9;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.1);
+  background: #000;
+}
+.lightbox-content iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+.lightbox-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.15);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 2202;
+  transition: background 0.15s;
+}
+.lightbox-close-btn:hover { background: rgba(239,68,68,.8); }
+
+/* Info / success banner in modal */
+.info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--banner-warn-bg);
+  border: 1px solid var(--banner-warn-border);
+  border-radius: 4px;
+  padding: 10px 14px;
+  animation: fadeIn 0.25s ease-out;
+}
+.info-banner.success-banner {
+  background: var(--banner-ok-bg) !important;
+  border-color: var(--banner-ok-border) !important;
+}
+.info-banner .info-icon { color: var(--banner-warn-text); flex-shrink: 0; margin-top: 1px; }
+.info-banner.success-banner .info-icon { color: var(--banner-ok-text) !important; }
+.info-banner .info-icon svg { width: 14px; height: 14px; stroke: currentColor; fill: none; }
+.info-banner .info-content { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.info-banner .info-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--banner-warn-text);
+  line-height: 1.4;
+}
+.info-banner.success-banner .info-text { color: var(--banner-ok-text) !important; }
+.info-banner .info-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.info-banner .info-link {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--search-bg);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 3px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.1s, color 0.1s;
+}
+.info-banner .info-link:hover { background: var(--btn-hover-bg); color: var(--text); }
+
+/* Modal buttons */
+.modal-actions-row {
+  display: flex;
+  gap: 8px;
   margin-top: 8px;
 }
-
-.add-btn {
-  width: 100%;
-  background: linear-gradient(135deg, var(--primary-glow), #7743df);
+.save-btn {
+  background: var(--accent);
   border: none;
-  color: #ffffff;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-family: var(--font-family);
-  font-size: 0.75rem;
-  font-weight: 600;
+  color: #fff;
+  border-radius: 3px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(144, 94, 255, 0.2);
+  transition: filter 0.1s;
+  padding: 6px 14px;
 }
-
-.add-btn:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 4px 15px rgba(144, 94, 255, 0.35);
-}
-
-.add-btn.loading {
-  background: #1f202a;
-  border: 1px solid var(--border-light);
+.save-btn:hover { filter: brightness(0.9); }
+.save-btn.loading {
+  background: var(--search-bg);
+  border: 1px solid var(--border);
   color: var(--text-muted);
   pointer-events: none;
-  box-shadow: none;
 }
+.save-btn.success { background: var(--green) !important; pointer-events: none; }
+.save-btn.warning { background: var(--yellow) !important; pointer-events: none; }
 
-.add-btn.success {
-  background: linear-gradient(135deg, #10b981, #059669);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-  pointer-events: none;
-}
-
-.open-link {
-  width: 100%;
-  text-decoration: none;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #10b981;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
+.btn-secondary {
+  background: var(--search-bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 3px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  transition: background 0.1s, color 0.1s;
+}
+.btn-secondary:hover { background: var(--btn-hover-bg); color: var(--text); }
+
+/* ============================================================
+   SETTINGS DROPDOWN — Notion popover menu style
+   ============================================================ */
+.settings-menu-container { position: relative; }
+
+.settings-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--modal-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 0;
+  min-width: 180px;
+  box-shadow: var(--modal-shadow);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.15s ease;
+}
+.dropdown-item {
+  padding: 7px 14px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.dropdown-item:hover { background: var(--btn-hover-bg); }
+.dropdown-item svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* ============================================================
+   CONNECT / ONBOARDING CARD
+   ============================================================ */
+.connect-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 20px 32px;
+  width: 100%;
+  gap: 0;
+}
+.connect-card-icon {
+  margin-bottom: 16px;
+  color: var(--text-faint);
+}
+.connect-card-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+  opacity: .4;
+}
+.connect-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.connect-card-text {
+  max-width: 320px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.connect-actions-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.connect-button-link {
+  text-decoration: none;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 20px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  border: none;
+  transition: filter 0.1s;
+}
+.connect-button-link:hover { filter: brightness(0.9); }
+.connect-card-tip {
+  max-width: 360px;
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  line-height: 1.5;
+}
+.error-banner-alert {
+  background: rgba(235, 87, 87, 0.1);
+  border: 1px solid rgba(235, 87, 87, 0.25);
+  color: #eb5757;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  max-width: 340px;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   CONNECT TOKEN UI (ct-*) — two-tab inline connect flow
+   ============================================================ */
+.ct-tab-bar {
+  display: flex;
   gap: 4px;
-  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+  width: 100%;
+}
+.ct-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 8px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.ct-tab:hover { color: var(--text); }
+.ct-tab-active { border-bottom-color: var(--accent); color: var(--text); }
+.ct-tab-badge {
+  font-size: 9px;
+  font-weight: 700;
+  background: rgba(82, 158, 114, 0.18);
+  color: var(--green);
+  border-radius: 2px;
+  padding: 1px 4px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.ct-panel { width: 100%; }
+
+/* Step-by-step guide */
+.ct-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.ct-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+}
+.ct-step-num {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+.ct-step-body { flex: 1; }
+.ct-step-label { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.ct-step-desc { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
+.ct-step-desc code {
+  background: var(--search-bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0 3px;
+  font-family: monospace;
+  font-size: 10px;
 }
 
-.open-link:hover {
-  background: rgba(16, 185, 129, 0.08);
+/* Token input row */
+.ct-token-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--search-bg);
+  overflow: hidden;
+  width: 100%;
+}
+.ct-token-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text);
+  padding: 8px 10px;
+  min-width: 0;
+}
+.ct-token-input::placeholder { color: var(--text-faint); }
+.ct-eye-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  border-left: 1px solid var(--border);
+  color: var(--text-faint);
+  cursor: pointer;
+  padding: 0 10px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+.ct-eye-btn:hover { color: var(--text); }
+
+/* Error message */
+.ct-error {
+  font-size: 11px;
+  color: var(--red);
+  margin-top: 5px;
+  padding: 6px 8px;
+  background: rgba(235, 87, 87, 0.08);
+  border: 1px solid rgba(235, 87, 87, 0.2);
+  border-radius: 3px;
+  line-height: 1.4;
 }
 
-/* --- Custom animations --- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ============================================================
+   AUTH WAITING SCREEN — animated state while polling for OAuth
+   ============================================================ */
+.auth-waiting-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  position: relative;
+}
+.auth-orbit-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin 1.8s linear infinite;
+  position: relative;
+}
+.auth-orbit-ring svg {
+  position: absolute;
+  animation: spin-reverse 1.8s linear infinite;
+}
+@keyframes spin-reverse { to { transform: rotate(-360deg); } }
+
+.auth-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--search-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+.auth-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+.auth-status-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.auth-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.auth-manual-link {
+  font-size: 11px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.auth-manual-link:hover { text-decoration: underline; }
+
+/* ============================================================
+   STEPPER — compact Notion-style step indicator
+   ============================================================ */
+.progress-stepper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease;
+}
+.step-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 3px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+  transition: all 0.2s;
+}
+.step-pill.active {
+  background: var(--btn-active-bg);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+.step-pill.done {
+  background: rgba(82, 158, 114, 0.1);
+  border-color: rgba(82, 158, 114, 0.3);
+  color: var(--green);
+}
+.step-line {
+  height: 1px;
+  width: 20px;
+  background: var(--border);
+}
+.step-line.active { background: var(--accent); }
+
+/* ============================================================
+   AUTO-MAPPING SUCCESS VIEW
+   ============================================================ */
+.auto-success-view-container { text-align: center; margin-bottom: 16px; }
+.auto-success-icon { display: block; font-size: 2rem; margin-bottom: 8px; }
+.auto-success-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.auto-success-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; max-width: 400px; margin: 0 auto; }
+.detected-mappings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--search-bg);
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.detected-mapping-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.detected-mapping-row:last-child { border-bottom: none; }
+.detected-mapping-label { font-weight: 600; color: var(--text); }
+.detected-mapping-value {
+  color: var(--accent);
+  font-weight: 500;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
+}
+.auto-success-actions-container { text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.countdown-banner { font-size: 11px; color: var(--accent); font-weight: 600; }
+.auto-success-btn-row { display: flex; gap: 8px; width: 100%; }
+.embed-urls-header { color: var(--accent) !important; font-weight: 700 !important; }
+.embed-urls-hub-row { border-color: rgba(35,131,226,.3) !important; background: rgba(35,131,226,.05) !important; }
+.embed-warning-banner {
+  margin-top: 10px;
+  font-size: 12px;
+  background: var(--banner-warn-bg);
+  border: 1px solid var(--banner-warn-border);
+  color: var(--banner-warn-text);
+  padding: 10px 12px;
+  border-radius: 4px;
+  line-height: 1.4;
+}
+.disconnect-warning-section { margin-top: 24px; border-color: rgba(235,87,87,.2) !important; background: rgba(235,87,87,.04) !important; }
+.disconnect-warning-title { color: #eb5757 !important; }
+.disconnect-warning-btn { border-color: rgba(235,87,87,.35) !important; color: #eb5757 !important; width: 100%; transition: all 0.15s; }
+
+/* ============================================================
+   MODAL LOADING DETAIL
+   ============================================================ */
+.modal-loading-details { display: flex; align-items: center; gap: 10px; padding: 10px 0; }
+.modal-loading-details .spinner { width: 16px; height: 16px; border-width: 2px; }
+.modal-loading-text { color: var(--text-muted); font-size: 13px; }
+
+/* ============================================================
+   NOTION ICON UTILITY
+   ============================================================ */
+.notion-icon {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.notion-icon-inline { margin-right: 6px; }
+.notion-icon-large  { width: 28px; height: 28px; stroke-width: 1.8; }
+.notion-logo-svg    { width: 32px; height: 32px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+
+/* Tab icon images (genre covers) */
+.tab-icon-img { width: 16px; height: 16px; object-fit: contain; }
+.placeholder-icon-img { width: 28px; height: 28px; opacity: .3; object-fit: contain; }
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px !important;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeIn  { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* ============================================================
+   RESPONSIVE — narrow embeds / mobile
+   ============================================================ */
+@media (max-width: 480px) {
+  .breadcrumb-header { padding: 8px 12px 0; }
+  .search-section { padding: 10px 12px 0; }
+  .results-container { padding: 10px 12px 12px; }
+  .results-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .modal-overlay { padding: 20px 8px 8px; }
+  .modal-page-body { padding: 16px; }
+  .notion-modal-title { font-size: 20px; }
 }
 
-/* --- Recommendations Carousel Layout --- */
+/* ============================================================
+   SETTINGS MAPPING GRID & FORM ELEMENTS
+   ============================================================ */
+.mapping-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 480px) {
+  .mapping-grid {
+    grid-template-columns: 130px 1fr;
+    align-items: center;
+  }
+}
+.mapping-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+}
+.mapping-select {
+  width: 100%;
+  background: var(--search-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.mapping-select:focus {
+  border-color: var(--accent);
+}
+.mapping-select option {
+  background: var(--modal-bg);
+  color: var(--text);
+}
+
+/* ============================================================
+   RECOMMENDATIONS SYSTEM
+   ============================================================ */
+.empty-state.recommendations-active {
+  display: block;
+  text-align: left;
+  padding: 12px 16px;
+  color: var(--text);
+  width: 100%;
+}
+
+.recommendations-container {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+}
+
 .recommendations-section {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  margin-top: 16px;
-  animation: fadeIn 0.5s ease-out;
-}
-
-.recs-row {
-  display: flex;
-  flex-direction: column;
   gap: 12px;
-}
-
-.recs-row-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.recs-row-title {
-  font-family: var(--font-header);
-  font-size: 1.2rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: #ffffff;
-}
-
-.recs-carousel-wrapper {
-  position: relative;
   width: 100%;
 }
 
-.recs-carousel {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scrollbar-width: none; /* Firefox */
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
-  padding: 8px 4px;
-}
-
-.recs-carousel::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-/* Force each media-card in the carousel to have a fixed width and snap alignment */
-.recs-carousel .media-card {
-  flex: 0 0 300px;
-  scroll-snap-align: start;
-}
-
-/* Carousel Navigation Buttons */
-.carousel-nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  background: rgba(9, 10, 15, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--border-light);
-  color: var(--text-main);
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  cursor: pointer;
+.recommendations-title-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  font-weight: 300;
-  line-height: 1;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  opacity: 0;
-  pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  justify-content: space-between;
+  padding: 0 4px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
 }
 
-.carousel-nav-btn:hover {
-  background: var(--primary-glow);
-  border-color: var(--primary-glow);
-  color: #ffffff;
-  box-shadow: 0 0 15px rgba(144, 94, 255, 0.4);
+.recommendations-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.prev-btn {
-  left: -16px;
-  padding-right: 2px;
+.recommendations-title svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  fill: none;
+  color: var(--text-muted);
+  display: block;
 }
 
-.next-btn {
-  right: -16px;
-  padding-left: 2px;
+/* Horizontal scroll slider */
+.recommendations-slider {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 4px 4px 12px 4px;
+  margin: 0 -4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Show arrows on wrapper hover if scrollable */
-.recs-carousel-wrapper:hover .carousel-nav-btn {
-  opacity: 1;
-  pointer-events: auto;
+/* Custom scrollbar for horizontal recommendation sliders */
+.recommendations-slider::-webkit-scrollbar {
+  height: 5px;
+}
+.recommendations-slider::-webkit-scrollbar-track {
+  background: transparent;
+}
+.recommendations-slider::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.recommendations-slider::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint);
 }
 
-/* Disabled state when carousel cannot scroll further */
-.carousel-nav-btn.disabled {
-  opacity: 0 !important;
-  pointer-events: none !important;
+/* Specific card styles inside slider */
+.recommendations-slider .media-card {
+  width: 145px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  border-radius: 4px;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.15s;
 }
 
-/* Small adjustments to media-cards for cleaner alignment in horizontal row */
-.recs-carousel .media-card {
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+.recommendations-slider .media-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-hover);
+}
+
+.recommendations-slider .card-cover-wrapper {
+  height: 195px;
+}
+
+.recommendations-slider .card-details {
+  padding: 6px 8px 8px;
+}
+
+.recommendations-slider .card-title {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.recommendations-slider .card-subtitle {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+/* Embed URLs section styles inside Settings modal */
+.embed-url-box {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.embed-url-input {
+  flex-grow: 1;
+  background: var(--search-bg);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: var(--font-family);
+  font-size: 0.85rem;
+  outline: none;
+}
+.embed-url-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: var(--tab-hover-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  margin-bottom: 8px;
+  transition: all 0.15s ease;
+}
+.embed-url-row:hover {
+  border-color: var(--card-hover-border);
+}
+.embed-url-row-header {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
