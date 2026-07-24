@@ -3,478 +3,437 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Setup - Notion Media Widget</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>Setup - Geek OS Media Widget</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Custom styles for Setup interface */
-    .setup-container {
-      max-width: 650px;
+    :root {
+      --bg-page: #191919;
+      --bg-card: #202020;
+      --bg-input: #262626;
+      --bg-input-hover: #2d2d2d;
+      --border-color: #2e2e2e;
+      --text-main: #e3e3e3;
+      --text-muted: #9b9b9b;
+      --accent-blue: #2383e2;
+      --accent-blue-hover: #1c6ec3;
+      --alert-bg: #2a1f1d;
+      --alert-border: #5a2e28;
+      --alert-text: #f87171;
     }
-    .setup-section {
-      background: rgba(20, 23, 36, 0.3);
-      border: 1px solid var(--border-light);
-      border-radius: 16px;
-      padding: 20px;
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 32px 16px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .setup-container {
+      width: 100%;
+      max-width: 540px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 28px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-group {
       margin-bottom: 24px;
     }
-    .setup-section h2 {
-      font-family: var(--font-header);
-      font-size: 1.1rem;
-      margin-bottom: 16px;
-      color: #ffffff;
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-main);
       display: flex;
       align-items: center;
       gap: 8px;
+      letter-spacing: -0.01em;
     }
-    .mapping-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-    @media (min-width: 480px) {
-      .mapping-grid {
-        grid-template-columns: 140px 1fr;
-        align-items: center;
-      }
-    }
-    .mapping-label {
-      font-size: 0.85rem;
-      font-weight: 600;
+
+    .header-subtitle {
+      font-size: 13px;
       color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .callout-alert {
+      background: var(--alert-bg);
+      border: 1px solid var(--alert-border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .callout-alert-title {
+      font-weight: 600;
+      color: var(--alert-text);
+      font-size: 13px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .mapping-select {
-      width: 100%;
-      background: rgba(10, 11, 18, 0.8);
-      border: 1px solid var(--border-light);
-      color: var(--text-main);
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-family: var(--font-family);
-      font-size: 0.85rem;
-      outline: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
+
+    .callout-alert-desc {
+      font-size: 13px;
+      color: #e5b8b5;
     }
-    .mapping-select:focus {
-      border-color: var(--primary-glow);
-    }
-    .embed-url-box {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .embed-url-input {
-      flex-grow: 1;
-      background: rgba(10, 11, 18, 0.8);
-      border: 1px solid var(--border-light);
-      color: var(--text-main);
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-family: var(--font-family);
-      font-size: 0.85rem;
-      outline: none;
-      read-only: true;
-    }
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-light);
-      color: var(--text-main);
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    .save-btn {
-      width: 100%;
-      background: linear-gradient(135deg, var(--primary-glow), #7743df);
-      border: none;
-      color: #ffffff;
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-family: var(--font-family);
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
+
+    .connect-btn {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
+      margin-top: 4px;
+      padding: 8px 14px;
+      background: var(--accent-blue);
+      color: #ffffff;
+      font-weight: 500;
+      font-size: 13px;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+
+    .connect-btn:hover {
+      background: var(--accent-blue-hover);
+    }
+
+    .mapping-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .mapping-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 10px 14px;
+      transition: border-color 0.15s ease;
+    }
+
+    .mapping-row:hover {
+      border-color: #3e3e3e;
+      background: var(--bg-input-hover);
+    }
+
+    .category-label {
+      display: flex;
+      align-items: center;
       gap: 8px;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(144, 94, 255, 0.25);
-    }
-    .save-btn:hover {
-      filter: brightness(1.1);
-      box-shadow: 0 4px 20px rgba(144, 94, 255, 0.4);
-    }
-    .status-toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: rgba(16, 185, 129, 0.95);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 1000;
-    }
-    .status-toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
-    .instruction-step {
-      font-size: 0.85rem;
-      line-height: 1.5;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-    .instruction-step strong {
+      font-weight: 500;
+      font-size: 13.5px;
       color: var(--text-main);
+      min-width: 130px;
     }
-    .error-box {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.2);
-      color: #fca5a5;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      margin-bottom: 20px;
-      display: none;
+
+    .select-wrapper {
+      position: relative;
+      flex: 1;
+    }
+
+    .select-input {
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      background: #1c1c1c;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      color: var(--text-main);
+      font-size: 13px;
+      padding: 7px 30px 7px 10px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .select-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.2);
+    }
+
+    .select-input option {
+      background: #202020;
+      color: #e3e3e3;
+    }
+
+    .select-chevron {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-muted);
+      font-size: 10px;
+    }
+
+    .action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .save-btn {
+      width: 100%;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: var(--accent-blue);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s ease, opacity 0.15s ease;
+    }
+
+    .save-btn:hover:not([disabled]) {
+      background: var(--accent-blue-hover);
+    }
+
+    .save-btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status-msg {
+      font-size: 12.5px;
+      text-align: center;
+      min-height: 18px;
+    }
+
+    .status-msg.success {
+      color: #4ade80;
+    }
+
+    .status-msg.error {
+      color: var(--alert-text);
     }
   </style>
 </head>
 <body>
-  <div class="glow-container">
-    <div class="glow-ball glow-purple"></div>
-    <div class="glow-ball glow-blue"></div>
-  </div>
 
-  <div class="widget-container setup-container">
-    <header class="widget-header">
-      <div class="logo-area">
-        <span class="logo-icon">⚙️</span>
-        <div class="logo-text">
-          <h1>Widget Configuration</h1>
-          <p>Link your Notion databases to the media categories</p>
-        </div>
+  <div class="setup-container">
+    <div class="header-group">
+      <div class="header-title">
+        <span>📁</span> Database Mappings
       </div>
-    </header>
-
-    <div id="error-message" class="error-box"></div>
-
-    <div id="setup-content">
-      <!-- Section 0: Auto Mapping Success View (Hidden by default) -->
-      <div id="auto-success-view" style="display: none;" class="setup-section">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <span style="font-size: 2.5rem; display: block; margin-bottom: 8px;">🎉</span>
-          <h2 style="font-family: var(--font-header); font-size: 1.25rem; color: #ffffff; margin-bottom: 8px; justify-content: center; display: flex; align-items: center; gap: 8px;">Workspace Connected!</h2>
-          <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; max-width: 420px; margin: 0 auto;">
-            We automatically detected and configured your Watchlist Tracker databases. No manual mapping is required.
-          </p>
-        </div>
-
-        <div id="detected-mappings-list" style="display: flex; flex-direction: column; gap: 8px; background: rgba(0, 0, 0, 0.25); padding: 14px; border-radius: 12px; border: 1px solid var(--border-light); margin-bottom: 20px;">
-          <!-- Filled dynamically -->
-        </div>
-
-        <div style="text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center;">
-          <div id="countdown-text" style="font-size: 0.8rem; color: #a78bfa; font-weight: 600; text-shadow: 0 0 10px rgba(167, 139, 250, 0.3);">
-            Ready to track! Closing window in 3 seconds...
-          </div>
-          <div style="display: flex; gap: 10px; width: 100%;">
-            <button id="confirm-close-btn" class="save-btn" style="flex: 1; margin: 0; padding: 10px 16px; font-size: 0.85rem;">
-              🚀 Close Now
-            </button>
-            <button id="edit-mappings-btn" class="btn-secondary" style="padding: 10px 16px; font-size: 0.85rem;">
-              ⚙️ Edit Mappings
-            </button>
-          </div>
-        </div>
+      <div class="header-subtitle" id="subHeader">
+        Select the database from your workspace that corresponds to each media category.
       </div>
+    </div>
 
-      <!-- Section 1: Database Mapping -->
-      <section id="mapping-form-section" class="setup-section">
-        <h2>📂 Database Mappings</h2>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
-          Select the database from your workspace that corresponds to each media category.
-        </p>
-        
-        <form id="mapping-form" class="mapping-grid">
-          <div class="mapping-label">🎬 Movies</div>
-          <select id="map-movie" class="mapping-select">
-            <option value="">-- Select Movie Database --</option>
-          </select>
+    <!-- Alert / Callout Banner (Shown on error or unauthenticated) -->
+    <div class="callout-alert" id="authAlert" style="display: none;">
+      <div class="callout-alert-title">
+        <span>⚠️</span> <span id="alertTitle">Workspace Not Authenticated</span>
+      </div>
+      <div class="callout-alert-desc" id="alertDesc">
+        Your Notion workspace is not connected or session expired. Re-connect your Notion workspace to enable database mapping.
+      </div>
+      <div>
+        <a href="/api/notion/login" class="connect-btn">Connect Notion Workspace</a>
+      </div>
+    </div>
 
-          <div class="mapping-label">📺 TV Shows</div>
-          <select id="map-tv" class="mapping-select">
-            <option value="">-- Select TV Show Database --</option>
-          </select>
+    <!-- Category Mapping List -->
+    <div class="mapping-list" id="mappingList">
+      <div style="color: var(--text-muted); text-align: center; padding: 20px 0;">Loading workspace configuration…</div>
+    </div>
 
-          <div class="mapping-label">📚 Books</div>
-          <select id="map-book" class="mapping-select">
-            <option value="">-- Select Book Database --</option>
-          </select>
-
-          <div class="mapping-label">🌸 Anime</div>
-          <select id="map-anime" class="mapping-select">
-            <option value="">-- Select Anime Database --</option>
-          </select>
-
-          <div class="mapping-label">📖 Manga</div>
-          <select id="map-manga" class="mapping-select">
-            <option value="">-- Select Manga Database --</option>
-          </select>
-
-          <div class="mapping-label">🎮 Games</div>
-          <select id="map-game" class="mapping-select">
-            <option value="">-- Select Game Database --</option>
-          </select>
-
-          <div class="mapping-label">🦸 Comics</div>
-          <select id="map-comic" class="mapping-select">
-            <option value="">-- Select Comic Database --</option>
-          </select>
-        </form>
-      </section>
-
-      <!-- Section 2: Embed Instructions -->
-      <section id="embed-section" class="setup-section">
-        <h2>🔗 Embed inside Notion</h2>
-        <div class="instruction-step">
-          1. Copy your unique widget embed URL below:
-        </div>
-        <div class="embed-url-box">
-          <input type="text" id="embed-url" class="embed-url-input" readonly value="Loading URL...">
-          <button id="copy-btn" class="btn-secondary">Copy</button>
-        </div>
-        <div id="embed-warning" style="display:none; margin-top:12px; font-size:0.75rem; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3); color:#fcd34d; padding:10px; border-radius:8px; line-height:1.4;">
-          ⚠️ <strong>Notion Embeds require HTTPS:</strong> Notion cannot load insecure <code>http://</code> links inside embeds. Please replace the domain with your secure public domain (e.g. <code>https://wet-animals-visit.loca.lt</code>) when pasting the link.
-        </div>
-        <div class="instruction-step" style="margin-top: 12px;">
-          2. Inside Notion, go to your dashboard, type <strong>/embed</strong>, and paste the URL.
-        </div>
-      </section>
-
-      <button id="save-button" class="save-btn">
-        💾 Save Configuration
-      </button>
+    <!-- Action Group -->
+    <div class="action-group">
+      <button class="save-btn" id="saveBtn" disabled>Save Configuration</button>
+      <div class="status-msg" id="statusMsg"></div>
     </div>
   </div>
 
-  <div id="toast" class="status-toast">
-    ✓ Mappings saved successfully!
-  </div>
-
   <script>
-    // Setup script
-    const urlParams = new URLSearchParams(window.location.search);
-    const workspaceId = urlParams.get('workspace_id');
+    const CATEGORIES = [
+      { id: 'movie', name: 'Movies', icon: '🎬', placeholder: '-- Select Movie Database --' },
+      { id: 'tv', name: 'TV Shows', icon: '📺', placeholder: '-- Select TV Show Database --' },
+      { id: 'book', name: 'Books', icon: '📚', placeholder: '-- Select Book Database --' },
+      { id: 'anime', name: 'Anime', icon: '🌸', placeholder: '-- Select Anime Database --' },
+      { id: 'manga', name: 'Manga', icon: '📖', placeholder: '-- Select Manga Database --' },
+      { id: 'game', name: 'Games', icon: '🎮', placeholder: '-- Select Game Database --' },
+      { id: 'comic', name: 'Comics', icon: '👤', placeholder: '-- Select Comic Database --' }
+    ];
 
-    if (!workspaceId) {
-      showError("Workspace ID is missing. Please authorize via the link on the home page.");
-      document.getElementById('setup-content').style.display = 'none';
-    } else {
-      initSetup();
+    const params = new URLSearchParams(location.search);
+    const workspaceId = params.get('workspace_id');
+    const isPopup = params.get('is_popup') === 'true';
+
+    const el = (id) => document.getElementById(id);
+
+    function showErrorAlert(title, desc) {
+      el('authAlert').style.display = 'flex';
+      el('alertTitle').textContent = title;
+      el('alertDesc').textContent = desc;
     }
 
-    function showError(msg) {
-      const errBox = document.getElementById('error-message');
-      errBox.textContent = msg;
-      errBox.style.display = 'block';
-    }
-
-    let countdownInterval = null;
-
-    function showAutoSuccessView(mappings, databases) {
-      const categoryLabels = {
-        movie: '🎬 Movies Database',
-        tv: '📺 TV Shows Database',
-        book: '📚 Books Database',
-        anime: '🌸 Anime Database',
-        manga: '📖 Manga Database',
-        game: '🎮 Games Database',
-        comic: '🦸 Comics Database'
-      };
-
-      const listContainer = document.getElementById('detected-mappings-list');
-      listContainer.innerHTML = '';
-
-      Object.entries(mappings).forEach(([type, dbId]) => {
-        const matchedDb = databases.find(db => db.id === dbId);
-        const dbTitle = matchedDb ? matchedDb.title : 'Linked';
-
-        const row = document.createElement('div');
-        row.style.display = 'flex';
-        row.style.justifyContent = 'space-between';
-        row.style.alignItems = 'center';
-        row.style.padding = '8px 0';
-        row.style.borderBottom = '1px solid rgba(255, 255, 255, 0.05)';
-        row.innerHTML = `
-          <span style="font-weight: 600; color: #ffffff; font-size: 0.8rem;">${categoryLabels[type]}</span>
-          <span style="color: #a78bfa; font-size: 0.8rem; font-weight: 500; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px;">${dbTitle}</span>
-        `;
-        listContainer.appendChild(row);
-      });
-
-      // Show auto success view, hide manual configuration sections
-      document.getElementById('auto-success-view').style.display = 'block';
-      document.getElementById('mapping-form-section').style.display = 'none';
-      const embedSection = document.getElementById('embed-section');
-      if (embedSection) embedSection.style.display = 'none';
-      document.getElementById('save-button').style.display = 'none';
-
-      // Start countdown
-      let countdown = 3;
-      document.getElementById('countdown-text').textContent = `Ready to track! Closing window in ${countdown} seconds...`;
-      
-      countdownInterval = setInterval(() => {
-        countdown--;
-        if (countdown <= 0) {
-          clearInterval(countdownInterval);
-          triggerClose();
-        } else {
-          document.getElementById('countdown-text').textContent = `Ready to track! Closing window in ${countdown} seconds...`;
-        }
-      }, 1000);
-
-      function triggerClose() {
-        if (window.opener) {
-          window.opener.postMessage({ type: 'setup_success', workspaceId }, '*');
-        }
-        window.close();
+    async function init() {
+      if (!workspaceId) {
+        showErrorAlert(
+          'Workspace Not Connected',
+          'No workspace ID found. Click below to connect your Notion workspace and map databases.'
+        );
+        renderEmptyMappings();
+        return;
       }
 
-      document.getElementById('confirm-close-btn').onclick = () => {
-        if (countdownInterval) clearInterval(countdownInterval);
-        triggerClose();
-      };
-
-      document.getElementById('edit-mappings-btn').onclick = () => {
-        if (countdownInterval) clearInterval(countdownInterval);
-        document.getElementById('auto-success-view').style.display = 'none';
-        document.getElementById('mapping-form-section').style.display = 'block';
-        if (urlParams.get('is_popup') !== 'true') {
-          const embedSection = document.getElementById('embed-section');
-          if (embedSection) embedSection.style.display = 'block';
-        }
-        document.getElementById('save-button').style.display = 'flex';
-      };
-    }
-
-    async function initSetup() {
-      // Set Embed URL text
-      const embedUrl = `${window.location.origin}/?workspace_id=${workspaceId}`;
-      document.getElementById('embed-url').value = embedUrl;
-
-      // Check if running on localhost and show HTTPS warning
-      if (window.location.protocol === 'http:' && window.location.hostname === 'localhost') {
-        document.getElementById('embed-warning').style.display = 'block';
-      }
-
-      // Check if running in a popup and hide the embed section
-      if (urlParams.get('is_popup') === 'true') {
-        const embedSection = document.getElementById('embed-section');
-        if (embedSection) embedSection.style.display = 'none';
-      }
-
-      // Enable Copy Button
-      document.getElementById('copy-btn').addEventListener('click', () => {
-        navigator.clipboard.writeText(embedUrl).then(() => {
-          showToast("✓ Embed URL copied to clipboard!");
-        });
-      });
-
-      showLoading(true);
       try {
-        // Fetch databases list and existing config
-        const [dbRes, configRes] = await Promise.all([
-          fetch(`/api/notion/databases?workspace_id=${workspaceId}`),
-          fetch(`/api/notion/config?workspace_id=${workspaceId}`)
+        const [cfgRes, dbRes] = await Promise.all([
+          fetch('/api/notion/config?workspace_id=' + encodeURIComponent(workspaceId)),
+          fetch('/api/notion/databases?workspace_id=' + encodeURIComponent(workspaceId))
         ]);
 
-        if (dbRes.status !== 200) {
-          const err = await dbRes.json();
-          throw new Error(err.error || "Failed to load databases");
+        if (dbRes.status === 401) {
+          showErrorAlert(
+            'Workspace Not Authenticated',
+            'Your Notion workspace connection is missing or expired. Click below to connect.'
+          );
+          renderEmptyMappings();
+          return;
         }
 
-        const databases = await dbRes.json();
-        const config = await configRes.json();
+        if (!cfgRes.ok || !dbRes.ok) {
+          throw new Error('Failed to load workspace data');
+        }
 
-        // Populate selects
-        const selects = ['movie', 'tv', 'book', 'anime', 'manga', 'game', 'comic'];
-        let allMapped = true;
-        selects.forEach(type => {
-          const select = document.getElementById(`map-${type}`);
-          databases.forEach(db => {
-            const opt = document.createElement('option');
-            opt.value = db.id;
-            opt.textContent = db.title;
-            select.appendChild(opt);
-          });
+        const cfg = await cfgRes.json();
+        const dbs = await dbRes.json();
 
-          // Set existing mapping if available
-          if (config && config.databaseMappings && config.databaseMappings[type]) {
-            select.value = config.databaseMappings[type];
-          } else {
-            allMapped = false;
+        if (cfg.workspaceName) {
+          el('subHeader').textContent = `Workspace: ${cfg.workspaceName} — Select the database for each media category.`;
+        }
+
+        renderMappingRows(dbs, cfg.databaseMappings || {});
+        el('saveBtn').disabled = false;
+      } catch (err) {
+        showErrorAlert(
+          'Connection Error',
+          err.message || 'Could not load databases from Notion. Click below to re-connect.'
+        );
+        renderEmptyMappings();
+      }
+    }
+
+    function renderEmptyMappings() {
+      const container = el('mappingList');
+      container.innerHTML = '';
+
+      CATEGORIES.forEach((cat) => {
+        const row = document.createElement('div');
+        row.className = 'mapping-row';
+        row.innerHTML = `
+          <div class="category-label">
+            <span>${cat.icon}</span>
+            <span>${cat.name}</span>
+          </div>
+          <div class="select-wrapper">
+            <select class="select-input" disabled>
+              <option>${cat.placeholder}</option>
+            </select>
+            <div class="select-chevron">▼</div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+      el('saveBtn').disabled = true;
+    }
+
+    function renderMappingRows(databases, currentMappings) {
+      const container = el('mappingList');
+      container.innerHTML = '';
+
+      if (!Array.isArray(databases) || databases.length === 0) {
+        showErrorAlert(
+          'No Shared Databases Found',
+          'No databases were shared with the integration. Please re-authenticate and grant access to your media databases.'
+        );
+        renderEmptyMappings();
+        return;
+      }
+
+      CATEGORIES.forEach((cat) => {
+        const row = document.createElement('div');
+        row.className = 'mapping-row';
+
+        const label = document.createElement('div');
+        label.className = 'category-label';
+        label.innerHTML = `<span>${cat.icon}</span><span>${cat.name}</span>`;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'select-wrapper';
+
+        const select = document.createElement('select');
+        select.className = 'select-input';
+        select.dataset.category = cat.id;
+
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.textContent = cat.placeholder;
+        select.appendChild(defaultOpt);
+
+        const currentMappedDb = currentMappings[cat.id];
+
+        databases.forEach((db) => {
+          const opt = document.createElement('option');
+          opt.value = db.id;
+          opt.textContent = (db.icon ? db.icon + ' ' : '') + db.title;
+          if (db.id === currentMappedDb) {
+            opt.selected = true;
           }
+          select.appendChild(opt);
         });
 
-        // Trigger Auto-success link confirmation if all categories are fully matched
-        if (allMapped && urlParams.get('is_popup') === 'true') {
-          showAutoSuccessView(config.databaseMappings, databases);
+        const chevron = document.createElement('div');
+        chevron.className = 'select-chevron';
+        chevron.textContent = '▼';
+
+        wrapper.appendChild(select);
+        wrapper.appendChild(chevron);
+
+        row.appendChild(label);
+        row.appendChild(wrapper);
+        container.appendChild(row);
+      });
+    }
+
+    el('saveBtn').onclick = async () => {
+      const saveBtn = el('saveBtn');
+      const statusMsg = el('statusMsg');
+
+      saveBtn.disabled = true;
+      statusMsg.className = 'status-msg';
+      statusMsg.textContent = 'Saving configuration…';
+
+      const mappings = {};
+      document.querySelectorAll('select.select-input').forEach((sel) => {
+        if (sel.dataset.category && sel.value) {
+          mappings[sel.dataset.category] = sel.value;
         }
-
-      } catch (err) {
-        showError(`Error initializing setup: ${err.message}`);
-      } finally {
-        showLoading(false);
-      }
-
-      // Add Save Listener
-      document.getElementById('save-button').addEventListener('click', saveConfig);
-    }
-
-    function showLoading(isLoading) {
-      const btn = document.getElementById('save-button');
-      if (isLoading) {
-        btn.disabled = true;
-        btn.innerHTML = `<span class="spinner" style="width:14px; height:14px; border-width:2px; display:inline-block; margin-right:4px;"></span> Loading databases...`;
-      } else {
-        btn.disabled = false;
-        btn.innerHTML = `💾 Save Configuration`;
-      }
-    }
-
-    async function saveConfig() {
-      const btn = document.getElementById('save-button');
-      btn.disabled = true;
-      btn.innerHTML = `<span class="spinner" style="width:14px; height:14px; border-width:2px; display:inline-block; margin-right:4px;"></span> Saving...`;
-
-      const mappings = {
-        movie: document.getElementById('map-movie').value,
-        tv: document.getElementById('map-tv').value,
-        book: document.getElementById('map-book').value,
-        anime: document.getElementById('map-anime').value,
-        manga: document.getElementById('map-manga').value,
-        game: document.getElementById('map-game').value,
-        comic: document.getElementById('map-comic').value
-      };
+      });
 
       try {
         const res = await fetch('/api/notion/map', {
@@ -483,38 +442,30 @@
           body: JSON.stringify({ workspaceId, mappings })
         });
 
-        const data = await res.json();
-        if (res.status !== 200) {
-          throw new Error(data.error || "Failed to save mappings");
+        if (!res.ok) throw new Error('Failed to save mappings');
+
+        statusMsg.className = 'status-msg success';
+        statusMsg.textContent = 'Configuration saved successfully!';
+
+        if (window.opener) {
+          window.opener.postMessage({ type: 'setup_success', workspaceId }, '*');
         }
 
-        showToast("✓ Configuration saved successfully!");
-
-        // If loaded in a popup window, inform the parent page and close
-        if (urlParams.get('is_popup') === 'true') {
-          setTimeout(() => {
-            if (window.opener) {
-              window.opener.postMessage({ type: 'setup_success', workspaceId }, '*');
-            }
+        setTimeout(() => {
+          if (isPopup) {
             window.close();
-          }, 1000);
-        }
+          } else {
+            statusMsg.textContent = 'Configuration saved! You can close this window.';
+          }
+        }, 1200);
       } catch (err) {
-        showError(`Failed to save configuration: ${err.message}`);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `💾 Save Configuration`;
+        statusMsg.className = 'status-msg error';
+        statusMsg.textContent = 'Could not save mappings. Please try again.';
+        saveBtn.disabled = false;
       }
-    }
+    };
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
+    init();
   </script>
 </body>
 </html>

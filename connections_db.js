@@ -1,7 +1,30 @@
 const { createClient } = require('@supabase/supabase-js');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
-// We will dynamically import/require @vercel/kv if it exists and check if it is configured
+// In-memory & local file fallback store
+const LOCAL_STORE_FILE = path.join(__dirname, 'connections.json');
+let memoryStore = {};
+
+try {
+  if (fs.existsSync(LOCAL_STORE_FILE)) {
+    const raw = fs.readFileSync(LOCAL_STORE_FILE, 'utf8');
+    memoryStore = JSON.parse(raw);
+  }
+} catch (err) {
+  memoryStore = {};
+}
+
+function saveMemoryStore() {
+  try {
+    fs.writeFileSync(LOCAL_STORE_FILE, JSON.stringify(memoryStore, null, 2), 'utf8');
+  } catch (err) {
+    // Read-only filesystem fallback (e.g. Vercel serverless environment)
+  }
+}
+
+// Dynamically check Vercel KV
 let kv = null;
 try {
   if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
@@ -16,41 +39,44 @@ try {
   console.warn('⚠️ Vercel KV SDK not available or failed to initialize:', err.message);
 }
 
+// Dynamically check Supabase
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
 let supabase = null;
-if (!kv) {
-  if (supabaseUrl && supabaseKey) {
+if (!kv && supabaseUrl && supabaseKey) {
+  try {
     supabase = createClient(supabaseUrl, supabaseKey);
-  } else {
-    console.warn('⚠️ Note: Neither Vercel KV nor Supabase is configured.');
+    console.log('⚡ Connected to Supabase connection database');
+  } catch (err) {
+    console.warn('⚠️ Supabase failed to initialize:', err.message);
   }
 }
 
 const connectionsDb = {
   async getConnection(workspaceId) {
     if (!workspaceId) return null;
+
+    // 1. Check local memory/file store first
+    if (memoryStore[workspaceId]) {
+      return memoryStore[workspaceId];
+    }
     
-    // 1. Try Vercel KV
+    // 2. Try Vercel KV
     if (kv) {
       try {
         const data = await kv.get(`connection:${workspaceId}`);
         if (data) {
-          return {
-            workspaceId: data.workspaceId,
-            accessToken: data.accessToken,
-            workspaceName: data.workspaceName,
-            databaseMappings: data.databaseMappings || {},
-            updatedAt: data.updatedAt
-          };
+          memoryStore[workspaceId] = data;
+          saveMemoryStore();
+          return data;
         }
       } catch (err) {
         console.error(`Error fetching connection from Vercel KV for workspace ${workspaceId}:`, err.message);
       }
     }
     
-    // 2. Fall back to Supabase
+    // 3. Fall back to Supabase
     if (supabase) {
       try {
         const { data, error } = await supabase
@@ -60,18 +86,20 @@ const connectionsDb = {
           .maybeSingle();
         
         if (error) throw error;
-        if (!data) return null;
-        
-        return {
-          workspaceId: data.workspace_id,
-          accessToken: data.access_token,
-          workspaceName: data.workspace_name,
-          databaseMappings: data.database_mappings || {},
-          updatedAt: data.updated_at
-        };
+        if (data) {
+          const conn = {
+            workspaceId: data.workspace_id,
+            accessToken: data.access_token,
+            workspaceName: data.workspace_name,
+            databaseMappings: data.database_mappings || {},
+            updatedAt: data.updated_at
+          };
+          memoryStore[workspaceId] = conn;
+          saveMemoryStore();
+          return conn;
+        }
       } catch (err) {
         console.error(`Error fetching connection from Supabase for workspace ${workspaceId}:`, err.message);
-        return null;
       }
     }
     
@@ -80,54 +108,50 @@ const connectionsDb = {
 
   async saveConnection(workspaceId, connectionData) {
     if (!workspaceId) return false;
-    let saved = false;
+
+    const payload = {
+      workspaceId,
+      accessToken: connectionData.accessToken,
+      workspaceName: connectionData.workspaceName,
+      databaseMappings: connectionData.databaseMappings || {},
+      updatedAt: new Date().toISOString()
+    };
+
+    // Always update local memory/file store
+    memoryStore[workspaceId] = payload;
+    saveMemoryStore();
 
     // 1. Save to Vercel KV
     if (kv) {
       try {
-        const payload = {
-          workspaceId,
-          accessToken: connectionData.accessToken,
-          workspaceName: connectionData.workspaceName,
-          databaseMappings: connectionData.databaseMappings || {},
-          updatedAt: new Date().toISOString()
-        };
         await kv.set(`connection:${workspaceId}`, payload);
-        saved = true;
       } catch (err) {
-        console.error(`Error saving connection to Vercel KV for workspace ${workspaceId}:`, err.message);
+        console.error(`Error saving connection to Vercel KV:`, err.message);
       }
     }
 
-    // 2. Save to Supabase (either as fallback or dual-write if wanted, let's keep it as fallback/alternative)
-    if (!saved && supabase) {
+    // 2. Save to Supabase
+    if (supabase) {
       try {
-        const payload = {
+        const dbPayload = {
           workspace_id: workspaceId,
           access_token: connectionData.accessToken,
           workspace_name: connectionData.workspaceName,
           database_mappings: connectionData.databaseMappings || {},
-          updated_at: new Date().toISOString()
+          updated_at: payload.updatedAt
         };
-
-        const { error } = await supabase
-          .from('connections')
-          .upsert(payload, { onConflict: 'workspace_id' });
-
-        if (error) throw error;
-        saved = true;
+        await supabase.from('connections').upsert(dbPayload, { onConflict: 'workspace_id' });
       } catch (err) {
-        console.error(`Error saving connection to Supabase for workspace ${workspaceId}:`, err.message);
+        console.error(`Error saving connection to Supabase:`, err.message);
       }
     }
 
-    return saved;
+    return true;
   },
 
   async updateMappings(workspaceId, mappings) {
     if (!workspaceId) return false;
     
-    // Fetch current connection first
     const connection = await this.getConnection(workspaceId);
     if (!connection) return false;
 
@@ -136,74 +160,53 @@ const connectionsDb = {
       ...mappings
     };
 
-    let updated = false;
+    connection.databaseMappings = updatedMappings;
+    connection.updatedAt = new Date().toISOString();
 
-    // 1. Update in Vercel KV
+    memoryStore[workspaceId] = connection;
+    saveMemoryStore();
+
     if (kv) {
       try {
-        const payload = {
-          ...connection,
-          databaseMappings: updatedMappings,
-          updatedAt: new Date().toISOString()
-        };
-        await kv.set(`connection:${workspaceId}`, payload);
-        updated = true;
+        await kv.set(`connection:${workspaceId}`, connection);
       } catch (err) {
-        console.error(`Error updating mappings in Vercel KV for workspace ${workspaceId}:`, err.message);
+        console.error(`Error updating mappings in Vercel KV:`, err.message);
       }
     }
 
-    // 2. Update in Supabase
-    if (!updated && supabase) {
+    if (supabase) {
       try {
-        const { error } = await supabase
+        await supabase
           .from('connections')
           .update({
             database_mappings: updatedMappings,
-            updated_at: new Date().toISOString()
+            updated_at: connection.updatedAt
           })
           .eq('workspace_id', workspaceId);
-
-        if (error) throw error;
-        updated = true;
       } catch (err) {
-        console.error(`Error updating mappings in Supabase for workspace ${workspaceId}:`, err.message);
+        console.error(`Error updating mappings in Supabase:`, err.message);
       }
     }
 
-    return updated;
+    return true;
   },
 
   async deleteConnection(workspaceId) {
     if (!workspaceId) return false;
-    let deleted = false;
+    delete memoryStore[workspaceId];
+    saveMemoryStore();
 
-    // 1. Delete from Vercel KV
     if (kv) {
       try {
         await kv.del(`connection:${workspaceId}`);
-        deleted = true;
-      } catch (err) {
-        console.error(`Error deleting connection from Vercel KV for workspace ${workspaceId}:`, err.message);
-      }
+      } catch (err) {}
     }
-
-    // 2. Delete from Supabase
     if (supabase) {
       try {
-        const { error } = await supabase
-          .from('connections')
-          .delete()
-          .eq('workspace_id', workspaceId);
-
-        if (error) throw error;
-        deleted = true;
-      } catch (err) {
-        console.error(`Error deleting connection from Supabase for workspace ${workspaceId}:`, err.message);
-      }
+        await supabase.from('connections').delete().eq('workspace_id', workspaceId);
+      } catch (err) {}
     }
-
-    return deleted;
+    return true;
   }
 };
 
