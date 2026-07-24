@@ -841,6 +841,7 @@ async function getAllAccessibleDatabases(userNotion) {
 }
 
 // Helper: Auto-detect workspace mappings based on titles + property signatures
+// Helper: Auto-detect workspace mappings based on titles, property signatures, and default IDs
 function autoDetectMappings(databases) {
   const mappings = {
     movie: null,
@@ -852,91 +853,68 @@ function autoDetectMappings(databases) {
     comic: null
   };
 
-  for (const db of databases) {
-    const title = (db.title?.map(t => t.plain_text).join('') || '').toLowerCase();
-    const props = Object.keys(db.properties || {});
-    const normProps = props.map(p => p.toLowerCase().trim());
+  const DEFAULT_MAP_IDS = {
+    movie: '7ab34024-5e7e-4b22-a368-5608e103c0aa',
+    tv: '36dd0aaf-19d0-8123-893f-cbaf9bff624a',
+    book: '8b2780bf-d844-42d8-bcd9-5223152c0ece',
+    anime: '36dd0aaf-19d0-8007-92e7-dca0434c570c',
+    manga: '370d0aaf-19d0-8121-a36f-f3dfcc914532',
+    game: '36fd0aaf-19d0-815b-b5d3-d51ed587a7d1',
+    comic: '371d0aaf-19d0-81c5-9b14-fbc0c52b0040'
+  };
 
-    // Heuristics:
-    // 1. Anime
-    if (
-      title.includes('anime') ||
-      normProps.includes('mal score') ||
-      (normProps.includes('episodes watched') && normProps.includes('studio') && !normProps.includes('seasons'))
-    ) {
+  const KEYWORDS = {
+    movie: ['movies', 'movie', 'film', 'cinema'],
+    tv: ['series', 'tv shows', 'tv show', 'tvshow', 'tv'],
+    book: ['books', 'book', 'reading', 'novel', 'library'],
+    anime: ['anime', 'mal', 'myanimelist'],
+    manga: ['manga', 'manhwa'],
+    game: ['games', 'game', 'video game', 'steam'],
+    comic: ['comics', 'comic', 'graphic novel']
+  };
+
+  // Pass 1: Match by explicit title keywords
+  for (const [category, keywords] of Object.entries(KEYWORDS)) {
+    for (const db of databases) {
+      if (mappings[category]) break;
+      if (Object.values(mappings).includes(db.id)) continue;
+      const title = (db.title?.map(t => t.plain_text).join('') || '').toLowerCase();
+      if (keywords.some(kw => title.includes(kw))) {
+        mappings[category] = db.id;
+        console.log(`✓ Title match: Category "${category}" mapped to "${title}" (${db.id})`);
+      }
+    }
+  }
+
+  // Pass 2: Match by property signatures for any unmapped category
+  for (const db of databases) {
+    if (Object.values(mappings).includes(db.id)) continue;
+    const props = Object.keys(db.properties || {}).map(p => p.toLowerCase().trim());
+
+    if (!mappings.anime && (props.includes('mal score') || (props.includes('episodes watched') && props.includes('studio')))) {
       mappings.anime = db.id;
-    }
-    // 2. Manga
-    else if (
-      title.includes('manga') ||
-      normProps.includes('publishingstatus') ||
-      (normProps.includes('chapters') && normProps.includes('volumes') && normProps.includes('authors'))
-    ) {
+    } else if (!mappings.manga && (props.includes('publishingstatus') || (props.includes('chapters') && props.includes('volumes')))) {
       mappings.manga = db.id;
-    }
-    // 3. Game
-    else if (
-      title.includes('game') ||
-      normProps.includes('metacritic') ||
-      (normProps.includes('platform') && normProps.includes('developer') && normProps.includes('publisher') && !normProps.includes('writer'))
-    ) {
+    } else if (!mappings.game && (props.includes('metacritic') || (props.includes('platform') && props.includes('developer')))) {
       mappings.game = db.id;
-    }
-    // 4. Comic
-    else if (
-      title.includes('comic') ||
-      (normProps.includes('writer') && normProps.includes('artist') && normProps.includes('issues'))
-    ) {
+    } else if (!mappings.comic && (props.includes('issues') || (props.includes('writer') && props.includes('artist')))) {
       mappings.comic = db.id;
-    }
-    // 5. Book
-    else if (
-      title.includes('book') ||
-      normProps.includes('total pages') ||
-      normProps.includes('total pages ') ||
-      (normProps.includes('pages read') && normProps.includes('author') && !normProps.includes('director'))
-    ) {
+    } else if (!mappings.book && (props.includes('total pages') || props.includes('pages read') || props.includes('isbn'))) {
       mappings.book = db.id;
-    }
-    // 6. TV / Series
-    else if (
-      title.includes('series') || title.includes('tv show') || title.includes('tvshow') || title.includes('tv') ||
-      normProps.includes('seasons') ||
-      (normProps.includes('episodes watched') && normProps.includes('total episodes') && normProps.includes('imdbrating') && !normProps.includes('studio'))
-    ) {
+    } else if (!mappings.tv && (props.includes('seasons') || (props.includes('episodes watched') && props.includes('total episodes')))) {
       mappings.tv = db.id;
-    }
-    // 7. Movie
-    else if (
-      title.includes('movie') ||
-      (normProps.includes('director') && normProps.includes('imdbrating') && normProps.includes('runtime') && !normProps.includes('seasons'))
-    ) {
+    } else if (!mappings.movie && (props.includes('director') || (props.includes('imdbrating') && props.includes('runtime')))) {
       mappings.movie = db.id;
     }
   }
 
-  // Fallback title-only keyword checks for remaining unmapped categories
-  const titleKeywords = {
-    movie: ['movie', 'film', 'cinema'],
-    tv: ['tv', 'series', 'show'],
-    book: ['book', 'novel', 'read'],
-    anime: ['anime', 'mal'],
-    manga: ['manga'],
-    game: ['game', 'steam', 'play'],
-    comic: ['comic', 'novel', 'graphic']
-  };
-
-  for (const [category, keywords] of Object.entries(titleKeywords)) {
+  // Pass 3: Check default template IDs
+  for (const [category, defaultId] of Object.entries(DEFAULT_MAP_IDS)) {
     if (!mappings[category]) {
-      const match = databases.find(db => {
-        const dbId = db.id;
-        if (Object.values(mappings).includes(dbId)) return false;
-        const titleText = (db.title?.map(t => t.plain_text).join('') || '').toLowerCase();
-        return keywords.some(kw => titleText.includes(kw));
-      });
+      const match = databases.find(db => db.id.replace(/-/g, '').toLowerCase() === defaultId.replace(/-/g, '').toLowerCase());
       if (match) {
         mappings[category] = match.id;
-        console.log(`💡 Text title match: Category "${category}" mapped to "${match.title?.map(t => t.plain_text).join('') || 'Untitled'}" (${match.id})`);
+        console.log(`✓ Default ID match: Category "${category}" mapped to "${match.title?.map(t => t.plain_text).join('') || 'Untitled'}" (${match.id})`);
       }
     }
   }
