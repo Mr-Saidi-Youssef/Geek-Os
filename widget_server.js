@@ -796,16 +796,67 @@ async function copyTemplateBlocks(userNotion, sourcePageId, targetPageId, mediaD
 
 // ─── Notion OAuth & Database Mapping Endpoints ───────────────────────────────
 
-// Helper: Fetch all accessible databases (with search + direct access fallback)
+// Helper: Fetch all accessible databases (with paginated search, child_database block inspection, + direct ID fallback)
 async function getAllAccessibleDatabases(userNotion) {
+  const databases = [];
+  const foundDbIds = new Set();
+
   try {
-    const response = await userNotion.search({
-      filter: { property: 'object', value: 'database' },
-      page_size: 100
-    });
+    // 1. Paginated Search (unfiltered to catch both top-level databases and parent pages)
+    let hasMore = true;
+    let startCursor = undefined;
+    const pagesToScan = [];
 
-    const databases = response.results.filter(item => item.object === 'database');
+    while (hasMore) {
+      const searchParams = { page_size: 100 };
+      if (startCursor) searchParams.start_cursor = startCursor;
 
+      const response = await userNotion.search(searchParams);
+      
+      for (const item of response.results) {
+        if (item.object === 'database') {
+          const normId = item.id.replace(/-/g, '').toLowerCase();
+          if (!foundDbIds.has(normId)) {
+            foundDbIds.add(normId);
+            databases.push(item);
+          }
+        } else if (item.object === 'page') {
+          pagesToScan.push(item);
+        }
+      }
+
+      hasMore = response.has_more;
+      startCursor = response.next_cursor;
+    }
+
+    console.log(`🔍 Search returned ${databases.length} direct databases and ${pagesToScan.length} pages to scan for child databases.`);
+
+    // 2. Scan child blocks of accessible pages for inline/child databases
+    for (const page of pagesToScan) {
+      try {
+        const blocksRes = await userNotion.blocks.children.list({ block_id: page.id, page_size: 100 });
+        for (const block of blocksRes.results) {
+          if (block.type === 'child_database') {
+            const normId = block.id.replace(/-/g, '').toLowerCase();
+            if (!foundDbIds.has(normId)) {
+              try {
+                const fullDb = await userNotion.databases.retrieve({ database_id: block.id });
+                foundDbIds.add(normId);
+                databases.push(fullDb);
+                const title = fullDb.title?.map(t => t.plain_text).join('') || block.child_database?.title || 'Untitled Database';
+                console.log(`✓ Discovered inline child database: "${title}" (${fullDb.id}) inside page ${page.id}`);
+              } catch (err) {
+                console.warn(`⚠️ Could not retrieve child database ${block.id}:`, err.message);
+              }
+            }
+          }
+        }
+      } catch (_) {
+        // Skip pages where blocks cannot be listed
+      }
+    }
+
+    // 3. Direct ID Fallback check for default template databases
     const defaultCheckIds = [
       '36dd0aaf-19d0-8007-92e7-dca0434c570c', // Anime Library
       '370d0aaf-19d0-8121-a36f-f3dfcc914532', // Manga Library
@@ -817,26 +868,24 @@ async function getAllAccessibleDatabases(userNotion) {
     ];
 
     for (const id of defaultCheckIds) {
-      const normalizedId = id.replace(/-/g, '').toLowerCase();
-      const alreadyFound = databases.some(db => db.id.replace(/-/g, '').toLowerCase() === normalizedId);
-      
-      if (!alreadyFound) {
+      const normId = id.replace(/-/g, '').toLowerCase();
+      if (!foundDbIds.has(normId)) {
         try {
-          console.log(`🔍 Search fallback: checking direct access to default database ${id}...`);
+          console.log(`🔍 Checking direct access to default database ${id}...`);
           const db = await userNotion.databases.retrieve({ database_id: id });
+          foundDbIds.add(normId);
           databases.push(db);
           const dbTitle = db.title?.map(t => t.plain_text).join('') || 'Untitled Database';
-          console.log(`✓ Resolved default database via fallback: "${dbTitle}" (${db.id})`);
-        } catch (_) {
-          // Silently skip if user doesn't have access to this database
-        }
+          console.log(`✓ Resolved default database via direct retrieve: "${dbTitle}" (${db.id})`);
+        } catch (_) {}
       }
     }
 
+    console.log(`✅ Deep database scan complete. Total accessible databases found: ${databases.length}`);
     return databases;
   } catch (err) {
-    console.error('❌ Error fetching accessible databases:', err.message);
-    return [];
+    console.error('❌ Error in deep database scan:', err.message);
+    return databases;
   }
 }
 
