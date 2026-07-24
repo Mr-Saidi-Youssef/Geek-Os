@@ -1102,6 +1102,31 @@ app.post('/api/notion/map', async (req, res) => {
   res.json({ success: true });
 });
 
+// POST /api/notion/disconnect: Disconnect workspace or specific category mapping
+app.post('/api/notion/disconnect', async (req, res) => {
+  try {
+    const { workspaceId, type } = req.body;
+    if (!workspaceId) {
+      return res.status(400).json({ error: 'Missing workspaceId' });
+    }
+
+    if (!type || type === 'all') {
+      await connectionsDb.deleteConnection(workspaceId);
+      return res.json({ success: true, connectionDeleted: true });
+    } else {
+      const conn = await connectionsDb.getConnection(workspaceId);
+      if (conn && conn.databaseMappings) {
+        delete conn.databaseMappings[type];
+        await connectionsDb.updateMappings(workspaceId, conn.databaseMappings);
+      }
+      return res.json({ success: true, connectionDeleted: false });
+    }
+  } catch (err) {
+    console.error('❌ Error disconnecting Notion workspace:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── Search APIs proxies ──────────────────────────────────────────────────────
 
 // Anime Search (Jikan MAL API)
