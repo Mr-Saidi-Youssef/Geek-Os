@@ -1,17 +1,23 @@
 {
-  "name": "anime-notion-mal-sync",
+  "name": "geek-os",
   "version": "1.0.0",
-  "description": "Automated sync from MyAnimeList to Notion databases utilizing Jikan API v4 and Notion SDK",
-  "main": "sync.js",
+  "description": "Open-source Notion media operating system for anime, manga, movies, TV shows, games, books, and comics.",
+  "main": "widget_server.js",
   "scripts": {
-    "start": "node widget_server.js"
+    "start": "node widget_server.js",
+    "dev": "node --watch widget_server.js",
+    "smoke": "node -e \"console.log('Geek-Os smoke check: OK')\""
   },
   "keywords": [
     "notion",
-    "myanimelist",
-    "jikan",
+    "media-tracker",
     "anime",
-    "sync",
+    "manga",
+    "movies",
+    "tv",
+    "games",
+    "books",
+    "comics",
     "automation"
   ],
   "author": "Byronotion",
@@ -25,5 +31,10 @@
     "axios": "^1.6.8",
     "dotenv": "^16.4.5",
     "express": "^5.2.1"
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "printWidth": 100
   }
 }
